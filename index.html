@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blood Pressure Log</title>
+<style>
+  :root{
+    --ink:#152634;
+    --paper:#f4f8fa;
+    --panel:#ffffff;
+    --line:#dde5e9;
+    --accent:#0f7a8c;
+    --accent-strong:#0a5866;
+    --red:#e05a4e;
+    --red-strong:#a83a30;
+    --amber:#e0a640;
+    --grey-strong:#5b6b74;
+    --radius:10px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-size:14px;}
+  #app{max-width:900px;margin:0 auto;padding:20px 20px 60px;}
+
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+    border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:18px;
+  }
+  header.top h1{font-size:21px;margin:0;display:flex;align-items:center;gap:8px;}
+  header.top button{
+    padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    cursor:pointer;font-size:13px;color:var(--ink);
+  }
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:18px;}
+  .panel h2{margin:0 0 14px;font-size:15px;}
+
+  .person-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px;}
+  .person-pill{
+    padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);
+    cursor:pointer;font-size:13px;color:var(--ink);
+  }
+  .person-pill.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .add-person{display:flex;gap:8px;align-items:center;}
+  .add-person input{padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:13px;width:160px;}
+  .add-person button{padding:8px 12px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-size:13px;}
+
+  .reading-form{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+  .reading-form .field{display:flex;flex-direction:column;gap:4px;}
+  .reading-form label{font-size:11px;color:var(--grey-strong);font-weight:600;}
+  .reading-form input{padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px;width:110px;}
+  .reading-form input#recordedAtInput{width:190px;}
+  .reading-form button{
+    padding:10px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;
+    cursor:pointer;font-size:13.5px;font-weight:600;
+  }
+
+  table.records{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.records th, table.records td{border:1px solid var(--line);padding:8px 10px;text-align:center;}
+  table.records th{background:#eaf3f5;font-size:11.5px;color:var(--grey-strong);text-transform:uppercase;letter-spacing:.3px;}
+  table.records td.dt{text-align:left;white-space:nowrap;}
+  table.records tr:hover td{background:#f6fbfc;}
+  table.records td.del{cursor:pointer;color:var(--red-strong);font-size:12px;}
+  table.records td.sel{width:30px;}
+
+  .toolbar-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;}
+  .toolbar-row button{
+    padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    cursor:pointer;font-size:13px;color:var(--ink);
+  }
+  .toolbar-row button.primary{background:var(--accent-strong);color:#fff;border-color:var(--accent-strong);}
+  .empty-note{color:var(--grey-strong);font-size:13px;padding:20px 0;text-align:center;}
+
+  #printArea{display:none;}
+  @page{ margin: 14mm; }
+  @media print{
+    #gate, #app{display:none !important;}
+    #printArea{display:block !important;}
+    #printArea h1{margin-bottom:2px;}
+    #printArea .sub{color:#555;margin-bottom:18px;font-size:13px;}
+    #printArea table{width:100%;border-collapse:collapse;font-size:13px;}
+    #printArea th, #printArea td{border:1.5px solid #000 !important;padding:7px 10px;text-align:center;}
+    #printArea th{background:#eaf3f5 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+
+  #gate{position:fixed;inset:0;background:var(--paper);z-index:100;display:flex;align-items:center;justify-content:center;}
+  #gate.hidden{display:none;}
+  .gate-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px;width:90%;max-width:320px;text-align:center;}
+  .gate-box h2{margin:0 0 6px;font-size:18px;}
+  .gate-box p{margin:0 0 16px;font-size:12.5px;color:var(--grey-strong);}
+  .gate-box input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px;margin-bottom:10px;}
+  .gate-box button{width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:14px;cursor:pointer;}
+  .gate-error{color:var(--red-strong);font-size:12px;min-height:16px;margin-bottom:6px;}
+  .note{font-size:11.5px;color:var(--grey-strong);line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-box">
+    <h2 id="gateTitle">Enter password</h2>
+    <p id="gateSub">This log is password-protected.</p>
+    <div class="gate-error" id="gateError"></div>
+    <input type="password" id="gatePass" placeholder="Password" autocomplete="off">
+    <input type="password" id="gatePass2" placeholder="Confirm password" style="display:none;" autocomplete="off">
+    <button id="gateBtn">Unlock</button>
+  </div>
+</div>
+
+<div id="app" style="display:none;">
+  <header class="top">
+    <h1>🩺 Blood Pressure Log</h1>
+    <button id="changePassBtn">Change password</button>
+  </header>
+
+  <div class="panel">
+    <h2>People</h2>
+    <div class="person-row" id="personRow"></div>
+    <div class="add-person">
+      <input id="newPersonName" placeholder="Full name">
+      <button id="addPersonBtn">Add person</button>
+    </div>
+  </div>
+
+  <div class="panel" id="formPanel" style="display:none;">
+    <h2 id="formPanelTitle">New reading</h2>
+    <div class="reading-form">
+      <div class="field"><label>SYS (mmHg)</label><input type="number" id="sysInput" placeholder="120"></div>
+      <div class="field"><label>DIA (mmHg)</label><input type="number" id="diaInput" placeholder="80"></div>
+      <div class="field"><label>PUL (/min)</label><input type="number" id="pulInput" placeholder="70"></div>
+      <div class="field"><label>Date &amp; time</label><input type="datetime-local" id="recordedAtInput"></div>
+      <button id="addReadingBtn">Add reading</button>
+    </div>
+  </div>
+
+  <div class="panel" id="recordsPanel" style="display:none;">
+    <h2 id="recordsPanelTitle">Readings</h2>
+    <div id="recordsWrap"></div>
+    <div class="toolbar-row">
+      <button id="selectAllBtn">Select all</button>
+      <button id="clearSelBtn">Clear selection</button>
+      <span style="flex:1"></span>
+      <button id="pdfBtn" class="primary">Print selected as PDF</button>
+    </div>
+  </div>
+
+  <div class="panel note">
+    Click "Add reading" to log a new entry — the date and time fill in automatically but you can adjust them if needed. Check the boxes next to any readings you'd like to include, then click "Print selected as PDF" to generate a clean printable summary for that person.
+  </div>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+(function(){
+  // ---------- Supabase ----------
+  const SUPABASE_URL = 'https://httgqjkxoelmulopykoi.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_fQPq4-OH5Uh40SDhMbLGgQ_ZMv82vvC';
+  const SUPABASE_CONFIGURED = !SUPABASE_URL.includes('YOUR_') && !SUPABASE_ANON_KEY.includes('YOUR_');
+
+  async function apiGet(path){
+    if(!SUPABASE_CONFIGURED) return [];
+    try{
+      const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+        headers: { apikey: SUPABASE_ANON_KEY }
+      });
+      if(!res.ok) return [];
+      return await res.json();
+    }catch(e){ return []; }
+  }
+  async function apiInsert(table, body, returnRep){
+    if(!SUPABASE_CONFIGURED) return null;
+    try{
+      const res = await fetch(SUPABASE_URL + '/rest/v1/' + table, {
+        method:'POST',
+        headers:{
+          apikey: SUPABASE_ANON_KEY, 'Content-Type':'application/json',
+          Prefer: returnRep ? 'return=representation' : 'return=minimal'
+        },
+        body: JSON.stringify(body)
+      });
+      if(!res.ok) return null;
+      return returnRep ? await res.json() : true;
+    }catch(e){ return null; }
+  }
+  async function apiUpsert(table, body){
+    if(!SUPABASE_CONFIGURED) return;
+    try{
+      await fetch(SUPABASE_URL + '/rest/v1/' + table, {
+        method:'POST',
+        headers:{
+          apikey: SUPABASE_ANON_KEY, 'Content-Type':'application/json',
+          Prefer: 'resolution=merge-duplicates,return=minimal'
+        },
+        body: JSON.stringify(body)
+      });
+    }catch(e){}
+  }
+  async function apiPatch(table, filterQS, body){
+    if(!SUPABASE_CONFIGURED) return;
+    try{
+      await fetch(SUPABASE_URL + '/rest/v1/' + table + '?' + filterQS, {
+        method:'PATCH',
+        headers:{apikey:SUPABASE_ANON_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+        body: JSON.stringify(body)
+      });
+    }catch(e){}
+  }
+  async function apiDelete(table, filterQS){
+    if(!SUPABASE_CONFIGURED) return;
+    try{
+      await fetch(SUPABASE_URL + '/rest/v1/' + table + '?' + filterQS, {
+        method:'DELETE', headers:{apikey:SUPABASE_ANON_KEY}
+      });
+    }catch(e){}
+  }
+  async function getSetting(key){
+    const rows = await apiGet('app_settings?key=eq.' + encodeURIComponent(key) + '&select=value');
+    return rows.length ? rows[0].value : null;
+  }
+  async function setSetting(key, value){
+    await apiUpsert('app_settings', {key, value});
+  }
+
+  async function sha256(text){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+
+  // ---------- password gate ----------
+  async function initGate(){
+    const gate = document.getElementById('gate');
+    const app = document.getElementById('app');
+    const title = document.getElementById('gateTitle');
+    const sub = document.getElementById('gateSub');
+    const err = document.getElementById('gateError');
+    const p1 = document.getElementById('gatePass');
+    const p2 = document.getElementById('gatePass2');
+    const btn = document.getElementById('gateBtn');
+
+    if(!SUPABASE_CONFIGURED){
+      err.textContent = 'Heads up: this copy isn\'t connected to the database yet.';
+    }
+
+    let existingHash = null;
+    try{ existingHash = await getSetting('app_password'); }catch(e){}
+
+    const settingUp = !existingHash;
+    if(settingUp){
+      title.textContent = 'Set a password';
+      sub.textContent = 'Create a password to protect this log. Anyone with this link and password can view and edit it.';
+      p2.style.display = 'block';
+      btn.textContent = 'Set password';
+    } else {
+      title.textContent = 'Enter password';
+      sub.textContent = 'This log is password-protected.';
+      p2.style.display = 'none';
+      btn.textContent = 'Unlock';
+    }
+
+    function unlock(){
+      gate.classList.add('hidden');
+      app.style.display = 'block';
+      loadPeople();
+    }
+
+    btn.onclick = async ()=>{
+      err.textContent = '';
+      if(settingUp){
+        if(!p1.value || p1.value.length<4){ err.textContent='Use at least 4 characters.'; return; }
+        if(p1.value !== p2.value){ err.textContent='Passwords do not match.'; return; }
+        const hash = await sha256(p1.value);
+        await setSetting('app_password', hash);
+        unlock();
+      } else {
+        const hash = await sha256(p1.value);
+        if(hash === existingHash){ unlock(); }
+        else { err.textContent = 'Incorrect password.'; p1.value=''; }
+      }
+    };
+    p1.addEventListener('keydown', e=>{ if(e.key==='Enter' && !settingUp) btn.click(); });
+    p2.addEventListener('keydown', e=>{ if(e.key==='Enter') btn.click(); });
+  }
+
+  document.getElementById('changePassBtn').onclick = async ()=>{
+    const existingHash = await getSetting('app_password');
+    const cur = prompt('Enter current password:');
+    if(cur===null) return;
+    const curHash = await sha256(cur);
+    if(existingHash && curHash !== existingHash){ alert('Incorrect current password.'); return; }
+    const next = prompt('Enter new password (at least 4 characters):');
+    if(next===null) return;
+    if(next.length<4){ alert('Password too short.'); return; }
+    const confirm2 = prompt('Confirm new password:');
+    if(next !== confirm2){ alert('Passwords did not match.'); return; }
+    const newHash = await sha256(next);
+    await setSetting('app_password', newHash);
+    alert('Password updated.');
+  };
+
+  // ---------- state ----------
+  let people = [];
+  let currentPersonId = null;
+  let records = [];
+  let selectedIds = new Set();
+
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+  function localDatetimeValue(d){
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+  }
+  function formatDisplay(iso){
+    const d = new Date(iso);
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    let h = d.getHours(); const ampm = h>=12 ? 'PM':'AM'; h = h%12; if(h===0) h=12;
+    return months[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()+' — '+h+':'+pad(d.getMinutes())+' '+ampm;
+  }
+
+  async function loadPeople(){
+    people = await apiGet('people?select=*&order=name.asc');
+    renderPeople();
+    if(people.length && !currentPersonId){
+      currentPersonId = people[0].id;
+    }
+    if(currentPersonId){
+      await loadRecords();
+    }
+    renderFormAndRecordsVisibility();
+  }
+
+  function renderFormAndRecordsVisibility(){
+    const has = !!currentPersonId;
+    document.getElementById('formPanel').style.display = has ? 'block':'none';
+    document.getElementById('recordsPanel').style.display = has ? 'block':'none';
+    const person = people.find(p=>p.id===currentPersonId);
+    if(person){
+      document.getElementById('formPanelTitle').textContent = 'New reading — ' + person.name;
+      document.getElementById('recordsPanelTitle').textContent = 'Readings — ' + person.name;
+    }
+  }
+
+  function renderPeople(){
+    const row = document.getElementById('personRow');
+    row.innerHTML = '';
+    if(!people.length){
+      const note = document.createElement('span');
+      note.className = 'note';
+      note.textContent = 'No one added yet — add a person below to get started.';
+      row.appendChild(note);
+      return;
+    }
+    people.forEach(p=>{
+      const pill = document.createElement('button');
+      pill.className = 'person-pill' + (p.id===currentPersonId ? ' active':'');
+      pill.textContent = p.name;
+      pill.onclick = async ()=>{
+        currentPersonId = p.id;
+        selectedIds = new Set();
+        renderPeople();
+        renderFormAndRecordsVisibility();
+        await loadRecords();
+      };
+      row.appendChild(pill);
+    });
+  }
+
+  document.getElementById('addPersonBtn').onclick = async ()=>{
+    const nameInput = document.getElementById('newPersonName');
+    const name = nameInput.value.trim();
+    if(!name) return;
+    const rows = await apiInsert('people', {name}, true);
+    nameInput.value = '';
+    if(rows && rows.length){
+      currentPersonId = rows[0].id;
+    }
+    await loadPeople();
+  };
+
+  async function loadRecords(){
+    if(!currentPersonId){ records = []; renderRecords(); return; }
+    records = await apiGet('bp_records?person_id=eq.' + currentPersonId + '&select=*&order=recorded_at.desc');
+    renderRecords();
+  }
+
+  function renderRecords(){
+    const wrap = document.getElementById('recordsWrap');
+    wrap.innerHTML = '';
+    if(!records.length){
+      const note = document.createElement('div');
+      note.className = 'empty-note';
+      note.textContent = 'No readings logged yet for this person.';
+      wrap.appendChild(note);
+      return;
+    }
+    const table = document.createElement('table');
+    table.className = 'records';
+    const thead = document.createElement('thead');
+    thead.innerHTML = '<tr><th></th><th>Date &amp; time</th><th>SYS</th><th>DIA</th><th>PUL</th><th></th></tr>';
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+    records.forEach(r=>{
+      const tr = document.createElement('tr');
+      const selTd = document.createElement('td'); selTd.className = 'sel';
+      const cb = document.createElement('input'); cb.type = 'checkbox';
+      cb.checked = selectedIds.has(r.id);
+      cb.onchange = ()=>{ if(cb.checked) selectedIds.add(r.id); else selectedIds.delete(r.id); };
+      selTd.appendChild(cb);
+      const dtTd = document.createElement('td'); dtTd.className='dt'; dtTd.textContent = formatDisplay(r.recorded_at);
+      const sysTd = document.createElement('td'); sysTd.textContent = r.sys;
+      const diaTd = document.createElement('td'); diaTd.textContent = r.dia;
+      const pulTd = document.createElement('td'); pulTd.textContent = r.pul;
+      const delTd = document.createElement('td'); delTd.className='del'; delTd.textContent='Delete';
+      delTd.onclick = async ()=>{
+        if(!confirm('Delete this reading?')) return;
+        await apiDelete('bp_records', 'id=eq.' + r.id);
+        selectedIds.delete(r.id);
+        await loadRecords();
+      };
+      tr.appendChild(selTd); tr.appendChild(dtTd); tr.appendChild(sysTd); tr.appendChild(diaTd); tr.appendChild(pulTd); tr.appendChild(delTd);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+  }
+
+  // default the datetime field to "now" whenever the form becomes relevant
+  function setNowOnDatetimeField(){
+    document.getElementById('recordedAtInput').value = localDatetimeValue(new Date());
+  }
+  setNowOnDatetimeField();
+
+  document.getElementById('addReadingBtn').onclick = async ()=>{
+    if(!currentPersonId){ alert('Add a person first.'); return; }
+    const sys = parseInt(document.getElementById('sysInput').value, 10);
+    const dia = parseInt(document.getElementById('diaInput').value, 10);
+    const pul = parseInt(document.getElementById('pulInput').value, 10);
+    const dtVal = document.getElementById('recordedAtInput').value;
+    if(!sys || !dia || !pul){ alert('Please fill in SYS, DIA, and PUL.'); return; }
+    if(!dtVal){ alert('Please set a date and time.'); return; }
+    const recordedAt = new Date(dtVal).toISOString();
+    await apiInsert('bp_records', {person_id: currentPersonId, sys, dia, pul, recorded_at: recordedAt}, false);
+    document.getElementById('sysInput').value = '';
+    document.getElementById('diaInput').value = '';
+    document.getElementById('pulInput').value = '';
+    setNowOnDatetimeField();
+    await loadRecords();
+  };
+
+  document.getElementById('selectAllBtn').onclick = ()=>{
+    records.forEach(r=>selectedIds.add(r.id));
+    renderRecords();
+  };
+  document.getElementById('clearSelBtn').onclick = ()=>{
+    selectedIds = new Set();
+    renderRecords();
+  };
+
+  document.getElementById('pdfBtn').onclick = ()=>{
+    const person = people.find(p=>p.id===currentPersonId);
+    const selected = records.filter(r=>selectedIds.has(r.id));
+    if(!selected.length){ alert('Check at least one reading to include in the PDF.'); return; }
+    // print in chronological order (oldest first) for a clean readable report
+    selected.sort((a,b)=> new Date(a.recorded_at) - new Date(b.recorded_at));
+    const printArea = document.getElementById('printArea');
+    printArea.innerHTML = '';
+    const h1 = document.createElement('h1'); h1.textContent = 'Blood Pressure Log';
+    const sub = document.createElement('div'); sub.className='sub';
+    sub.textContent = (person ? person.name : '') + ' — ' + selected.length + ' reading' + (selected.length===1?'':'s') + ' — printed ' + formatDisplay(new Date().toISOString());
+    printArea.appendChild(h1); printArea.appendChild(sub);
+    const table = document.createElement('table');
+    table.innerHTML = '<thead><tr><th>Date &amp; time</th><th>SYS (mmHg)</th><th>DIA (mmHg)</th><th>PUL (/min)</th></tr></thead>';
+    const tbody = document.createElement('tbody');
+    selected.forEach(r=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td style="text-align:left;">'+formatDisplay(r.recorded_at)+'</td><td>'+r.sys+'</td><td>'+r.dia+'</td><td>'+r.pul+'</td>';
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    printArea.appendChild(table);
+    window.print();
+  };
+
+  // init
+  initGate();
+})();
+</script>
+</body>
+</html>
