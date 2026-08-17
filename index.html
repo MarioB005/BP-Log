@@ -1302,39 +1302,6 @@
     const h1 = document.createElement('h1'); h1.textContent = state.company;
     printArea.appendChild(h1);
 
-    const morningVal = document.getElementById('morningStartInput').value;
-    const afternoonVal = document.getElementById('afternoonStartInput').value;
-    if(morningVal || afternoonVal){
-      const times = document.createElement('div');
-      times.style.cssText = 'font-size:17px;font-weight:700;color:#111;margin-bottom:14px;';
-      const parts = [];
-      if(morningVal){
-        const [mh,mm] = morningVal.split(':').map(Number);
-        parts.push('Morning shift: ' + formatHalfHour(mh, mm));
-      }
-      if(afternoonVal){
-        const [ah,am] = afternoonVal.split(':').map(Number);
-        parts.push('Afternoon shift: ' + formatHalfHour(ah, am));
-      }
-      times.textContent = parts.join('   |   ');
-      printArea.appendChild(times);
-    }
-
-    const legendWrap = document.createElement('div');
-    legendWrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:14px;margin:0 0 16px;font-size:12px;align-items:center;';
-    CONDITIONS.forEach(cond=>{
-      if(cond.key==='M' || cond.key==='A') return;
-      const item = document.createElement('span');
-      item.style.cssText = 'display:flex;align-items:center;gap:5px;';
-      const sw = document.createElement('span');
-      sw.className = 'swatch ' + cond.swatch;
-      sw.style.cssText = 'width:13px;height:13px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,.25);';
-      item.appendChild(sw);
-      item.appendChild(document.createTextNode(cond.label));
-      legendWrap.appendChild(item);
-    });
-    printArea.appendChild(legendWrap);
-
     [[currentYear,currentMonth],[nextYear,nextMonth]].forEach(([y,m])=>{
       const h2 = document.createElement('h2'); h2.textContent = MONTHS[m] + ' ' + y;
       printArea.appendChild(h2);
