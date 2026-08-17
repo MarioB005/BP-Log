@@ -3,247 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Work Schedule</title>
+<title>Blood Pressure Log</title>
 <style>
   :root{
-    --ink:#1c2b24;
-    --paper:#fbfaf6;
+    --ink:#152634;
+    --paper:#f4f8fa;
     --panel:#ffffff;
-    --line:#dfe2da;
-    --green:#7bd99a;
-    --green-strong:#1f8a4c;
-    --yellow:#ffd23f;
-    --yellow-strong:#a8790a;
-    --blue-past:rgba(30,90,200,0.42);
-    --blue-past-strong:#1e5ac8;
-    --morning:#ffab2e;
-    --afternoon:#8c5cf5;
-    --red:#ff6b6b;
-    --red-strong:#b0281e;
-    --skyblue:#3fc1f0;
-    --skyblue-strong:#0d6f96;
-    --vacation:#4d7ef0;
-    --vacation-strong:#2a4fb8;
-    --grey:#cfcabe;
-    --grey-strong:#6b6558;
-    --accent:#c05a2c;
+    --line:#dde5e9;
+    --accent:#0f7a8c;
+    --accent-strong:#0a5866;
+    --red:#e05a4e;
+    --red-strong:#a83a30;
+    --amber:#e0a640;
+    --grey-strong:#5b6b74;
     --radius:10px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   }
   *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-size:14px;
-  }
-  #app{max-width:1500px;margin:0 auto;padding:20px 24px 60px;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-size:14px;}
+  #app{max-width:900px;margin:0 auto;padding:20px 20px 60px;}
 
-  #stickyTop{
-    position: sticky; top: 0; z-index: 30; background: var(--paper);
-    padding-top: 0; padding-bottom: 4px;
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+    border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:18px;
   }
-  .dark-banner{
-    background:#12172b; color:#fff; display:flex; align-items:center; justify-content:space-between;
-    padding:10px 20px; position:relative; border-bottom: 2px solid var(--ink);
-  }
-  .db-left{display:flex; align-items:center; gap:10px; min-width:0;}
-  .db-icon{font-size:20px;}
-  .db-title-input{
-    font-weight:800; font-size:16px; letter-spacing:.3px; color:#fff;
-    background:transparent; border:none; border-bottom:2px dashed transparent; padding:2px 0; max-width:280px;
-  }
-  .db-title-input:hover, .db-title-input:focus{border-bottom-color:rgba(255,255,255,.4); outline:none;}
-  .db-right{display:flex; align-items:center; gap:14px;}
-  .db-icon-btn{
-    background:transparent; border:1px solid rgba(255,255,255,.25); color:#fff; width:34px; height:34px;
-    border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;
-  }
-  .db-icon-btn:hover{background:rgba(255,255,255,.1);}
-  .db-profile-btn{
-    background:transparent; border:none; color:#fff; display:flex; align-items:center; gap:8px; cursor:pointer; padding:2px;
-  }
-  .db-avatar{
-    width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.15); display:flex;
-    align-items:center;justify-content:center; font-size:16px;
-  }
-  .db-profile-text{display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;}
-  .db-role{font-size:10px; font-weight:800; letter-spacing:.5px; color:var(--morning);}
-  .db-name{font-size:12.5px; color:#d8dae6;}
-  .db-dropdown{
-    display:none; position:absolute; top:100%; right:56px; margin-top:6px; background:#fff; color:var(--ink);
-    border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.25); overflow:hidden; z-index:40; flex-direction:column;
-  }
-  .db-dropdown.show{display:flex;}
-  .db-dropdown button{
-    background:none; border:none; text-align:left; padding:11px 16px; font-size:13px; cursor:pointer; color:var(--ink);
-    border-bottom:1px solid var(--line);
-  }
-  .db-dropdown button:last-child{border-bottom:none;}
-  .db-dropdown button:hover{background:var(--paper);}
-  .db-dropdown-row{
-    display:flex; flex-direction:column; gap:5px; padding:11px 16px; font-size:12px; min-width:180px;
-  }
-  .db-dropdown-row label{color:var(--grey-strong); font-weight:600;}
-  .db-dropdown-row select{
-    padding:6px 8px; border:1px solid var(--line); border-radius:7px; font-size:12.5px; background:var(--panel); color:var(--ink);
-  }
-
-  .year-switch{display:flex;align-items:center;gap:8px;}
-  .year-switch button{
-    width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);
-    cursor:pointer;font-size:15px;line-height:1;
-  }
-  .year-switch input{width:70px;text-align:center;font-size:16px;font-weight:700;border:1px solid var(--line);
-    border-radius:6px;padding:5px;background:var(--panel);color:var(--ink);}
-  .year-switch-dark button{
-    background:transparent; border-color:rgba(255,255,255,.3); color:#fff;
-  }
-  .year-switch-dark button:hover{background:rgba(255,255,255,.1);}
-  .year-switch-dark input{
-    background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.3); color:#fff;
-  }
-
-  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;margin-top:14px;align-items:center;padding:0 20px;}
-  .toolbar button, .toolbar select{
+  header.top h1{font-size:21px;margin:0;display:flex;align-items:center;gap:8px;}
+  header.top button{
     padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
     cursor:pointer;font-size:13px;color:var(--ink);
   }
-  .toolbar button.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
-  .toolbar button.active-mode{background:var(--blue-past-strong);color:#fff;border-color:var(--blue-past-strong);}
 
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:18px;}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:18px;}
+  .panel h2{margin:0 0 14px;font-size:15px;}
 
-  table.sched{border-collapse:collapse;width:100%;table-layout:fixed;margin-bottom:6px;}
-  table.sched th, table.sched td{
-    border:1.5px solid #000;text-align:center;padding:0;font-size:11.5px;position:relative;
-    min-width:26px;height:26px;
+  .person-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px;}
+  .person-pill{
+    padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);
+    cursor:pointer;font-size:13px;color:var(--ink);
   }
-  table.sched th.emp, table.sched td.emp{
-    text-align:left;padding:4px 8px;font-weight:600;font-size:12.5px;min-width:100px;width:110px;
-    background:var(--panel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  table.sched thead th{font-weight:600;color:var(--grey-strong);}
-  table.sched thead th.dow, table.sched thead th.datenum{color:#000;}
-  .dow{background:var(--grey);color:#000;font-weight:700;}
-  .datenum{background:var(--grey);font-weight:800;color:#000;}
-  table.sched thead tr:last-child th{border-bottom:2px solid #000;}
-  .past::after{
-    content:"";position:absolute;inset:0;background:var(--blue-past);pointer-events:none;
-  }
-  .holiday-mark{position:absolute;top:0;right:1px;font-size:8px;color:var(--blue-past-strong);}
-  .month-block{margin-bottom:26px;}
-  .month-block h3{margin:0 0 8px;font-size:16px;}
+  .person-pill.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .add-person{display:flex;gap:8px;align-items:center;}
+  .add-person input{padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:13px;width:160px;}
+  .add-person button{padding:8px 12px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-size:13px;}
 
-  td.cell{cursor:pointer;user-select:none;}
-  td.cell.weekend, td.cell.holiday{background:var(--yellow);}
-  td.cell.work{background:var(--green);}
-  td.cell.OFF{background:var(--red);}
-  td.cell.SICK{background:var(--skyblue);}
-  td.cell.VAC{background:var(--vacation);}
-  td.cell.REQ{background:var(--grey);}
-  td.cell.UNPAID{
-    background-color: var(--red);
+  .reading-form{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+  .reading-form .field{display:flex;flex-direction:column;gap:4px;}
+  .reading-form label{font-size:11px;color:var(--grey-strong);font-weight:600;}
+  .reading-form input{padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px;width:110px;}
+  .reading-form input#recordedAtInput{width:190px;}
+  .reading-form button{
+    padding:10px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;
+    cursor:pointer;font-size:13.5px;font-weight:600;
   }
-  .swatch.weekend{background:var(--yellow);}
-  .swatch.work{background:var(--green);}
-  .swatch.OFF{background:var(--red);}
-  .swatch.SICK{background:var(--skyblue);}
-  .swatch.VAC{background:var(--vacation);}
-  .swatch.REQ{background:var(--grey);}
-  .swatch.UNPAID{
-    background-color: var(--red);
-  }
-  td.cell.range-anchor{box-shadow: inset 0 0 0 2px var(--ink);}
-  td.cell.range-selected{box-shadow: inset 0 0 0 2px var(--ink); filter:brightness(0.92);}
-  td.cell span.code{font-weight:700;font-size:10px;color:#2a2a2a;position:relative;z-index:2;}
-  .half-off{background: linear-gradient(to bottom left, var(--red) 50%, var(--green) 50%);}
-  .half-sick{background: linear-gradient(to bottom left, var(--skyblue) 50%, var(--green) 50%);}
-  .half-vac{background: linear-gradient(to bottom left, var(--vacation) 50%, var(--green) 50%);}
-  .work-m{background: linear-gradient(to bottom left, var(--morning) 50%, var(--green) 50%);}
-  .work-a{background: linear-gradient(to bottom left, var(--afternoon) 50%, var(--green) 50%);}
-  .half-badge{
-    position:absolute;top:1px;right:2px;font-size:10px;font-weight:800;color:#fff;z-index:2;
-    text-shadow:0 0 2px rgba(0,0,0,.7), 0 0 1px rgba(0,0,0,.7);
-  }
-  .shift-badge{
-    position:absolute;top:1px;left:1px;width:11px;height:11px;border-radius:50%;
-    font-size:8px;font-weight:800;color:#fff;line-height:11px;text-align:center;z-index:2;
-    box-shadow:0 0 0 1px rgba(255,255,255,.6);
-  }
-  .shift-badge.shift-M{background:var(--morning);}
-  .shift-badge.shift-A{background:var(--afternoon);}
 
-  .legend{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;align-items:center;}
-  .legend button, .shift-times button{
-    display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel);
-    border-radius:999px;padding:5px 10px 5px 6px;cursor:pointer;font-size:12px;color:var(--ink);
-  }
-  .legend button:hover, .shift-times button:hover{border-color:var(--ink);}
-  .shift-times{
-    display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; margin-top:10px; padding-top:10px;
-    border-top:1px solid var(--line); font-size:12.5px;
-  }
-  .shift-times-label{display:flex; align-items:center; gap:5px; color:var(--grey-strong); font-weight:600;}
-  .shift-times select{
-    padding:6px 8px; border:1px solid var(--line); border-radius:7px; font-size:12.5px; background:var(--panel); color:var(--ink);
-  }
-  .legend button.info{cursor:default;opacity:.75;}
-  .legend button.info:hover{border-color:var(--line);}
-  .swatch{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,.15);position:relative;flex-shrink:0;}
-  .swatch .mini-badge{
-    position:absolute;top:-2px;left:-2px;width:8px;height:8px;border-radius:50%;
-    border:1px solid rgba(255,255,255,.9);
-  }
-  .swatch .mini-badge.shift-M{background:var(--morning);}
-  .swatch .mini-badge.shift-A{background:var(--afternoon);}
+  table.records{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.records th, table.records td{border:1px solid var(--line);padding:8px 10px;text-align:center;}
+  table.records th{background:#eaf3f5;font-size:11.5px;color:var(--grey-strong);text-transform:uppercase;letter-spacing:.3px;}
+  table.records td.dt{text-align:left;white-space:nowrap;}
+  table.records tr:hover td{background:#f6fbfc;}
+  table.records td.del{cursor:pointer;color:var(--red-strong);font-size:12px;}
+  table.records td.sel{width:30px;}
 
-  .emp-manager{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px;}
-  .emp-manager .field{display:flex;flex-direction:column;gap:4px;}
-  .emp-manager label{font-size:11px;color:var(--grey-strong);}
-  .emp-manager input{padding:7px 9px;border:1px solid var(--line);border-radius:7px;font-size:13px;min-width:160px;}
-  .emp-list{display:flex;flex-direction:column;gap:6px;}
-  .emp-row{display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;}
-  .emp-row .name{font-weight:600;min-width:90px;}
-  .emp-row .email{color:var(--grey-strong);flex:1;}
-  .emp-row button{border:none;background:none;color:var(--red-strong);cursor:pointer;font-size:12px;}
-  .emp-row .order-btns{display:flex;flex-direction:column;gap:1px;margin-right:2px;}
-  .emp-row .order-btns button{color:var(--ink);font-size:11px;line-height:1;padding:1px 4px;border:1px solid var(--line);border-radius:4px;background:var(--panel);}
-  .emp-row .order-btns button:disabled{opacity:.3;cursor:default;}
-
-  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:50;}
-  .modal-backdrop.show{display:flex;}
-  .modal{background:#fff;border-radius:12px;padding:20px;max-width:360px;width:90%;}
-  .modal h3{margin-top:0;font-size:15px;}
-  .modal button{margin-top:12px;padding:8px 14px;border-radius:7px;border:1px solid var(--line);background:var(--panel);cursor:pointer;}
+  .toolbar-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;}
+  .toolbar-row button{
+    padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    cursor:pointer;font-size:13px;color:var(--ink);
+  }
+  .toolbar-row button.primary{background:var(--accent-strong);color:#fff;border-color:var(--accent-strong);}
+  .empty-note{color:var(--grey-strong);font-size:13px;padding:20px 0;text-align:center;}
 
   #printArea{display:none;}
-  @page { size: landscape; margin: 10mm; }
+  @page{ margin: 14mm; }
   @media print{
-    #gate, #app { display: none !important; }
-    #printArea { display: block !important; }
-    #printArea h2{margin-top:24px;}
-    * {
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-      color-adjust: exact !important;
-    }
-    td.cell.UNPAID{
-      background-color: var(--red) !important;
-    }
-    #printArea table.sched th, #printArea table.sched td{
-      border: 2px solid #000 !important;
-    }
-    #printArea .past::after{
-      background: var(--blue-past) !important;
-    }
+    #gate, #app{display:none !important;}
+    #printArea{display:block !important;}
+    #printArea h1{margin-bottom:2px;}
+    #printArea .sub{color:#555;margin-bottom:18px;font-size:13px;}
+    #printArea table{width:100%;border-collapse:collapse;font-size:13px;}
+    #printArea th, #printArea td{border:1.5px solid #000 !important;padding:7px 10px;text-align:center;}
+    #printArea th{background:#eaf3f5 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   }
-  .note{font-size:11.5px;color:var(--grey-strong);line-height:1.5;}
 
-  #gate{
-    position:fixed;inset:0;background:var(--paper);z-index:100;
-    display:flex;align-items:center;justify-content:center;
-  }
+  #gate{position:fixed;inset:0;background:var(--paper);z-index:100;display:flex;align-items:center;justify-content:center;}
   #gate.hidden{display:none;}
   .gate-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px;width:90%;max-width:320px;text-align:center;}
   .gate-box h2{margin:0 0 6px;font-size:18px;}
@@ -251,6 +92,7 @@
   .gate-box input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px;margin-bottom:10px;}
   .gate-box button{width:100%;padding:9px 10px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:14px;cursor:pointer;}
   .gate-error{color:var(--red-strong);font-size:12px;min-height:16px;margin-bottom:6px;}
+  .note{font-size:11.5px;color:var(--grey-strong);line-height:1.5;}
 </style>
 </head>
 <body>
@@ -258,7 +100,7 @@
 <div id="gate">
   <div class="gate-box">
     <h2 id="gateTitle">Enter password</h2>
-    <p id="gateSub">This schedule is password-protected.</p>
+    <p id="gateSub">This log is password-protected.</p>
     <div class="gate-error" id="gateError"></div>
     <input type="password" id="gatePass" placeholder="Password" autocomplete="off">
     <input type="password" id="gatePass2" placeholder="Confirm password" style="display:none;" autocomplete="off">
@@ -267,203 +109,122 @@
 </div>
 
 <div id="app" style="display:none;">
+  <header class="top">
+    <h1>🩺 Blood Pressure Log</h1>
+    <button id="changePassBtn">Change password</button>
+  </header>
 
-  <div id="stickyTop">
-    <div class="dark-banner">
-      <div class="db-left">
-        <span class="db-icon">🚁</span>
-        <input class="company db-title-input" id="companyName" value="AME Work Schedule">
-      </div>
-      <div class="db-right">
-        <div class="year-switch year-switch-dark">
-          <button id="yearPrev">‹</button>
-          <input id="yearInput" type="number" value="2026">
-          <button id="yearNext">›</button>
-        </div>
-        <button class="db-icon-btn" id="gearBtn" title="Settings">⚙</button>
-        <button class="db-profile-btn" id="profileBtn" title="Manager profile">
-          <span class="db-avatar">👨</span>
-          <span class="db-profile-text">
-            <span class="db-role" id="bannerRole">MANAGER</span>
-            <span class="db-name" id="bannerName">Set your name</span>
-          </span>
-        </button>
-      </div>
-
-      <div class="db-dropdown" id="gearDropdown">
-        <button id="addEmpToggle">+ Employee</button>
-        <button id="changePassBtn">Change password</button>
-        <div class="db-dropdown-row">
-          <label for="sessionTimeoutSelect">Auto-lock after</label>
-          <select id="sessionTimeoutSelect">
-            <option value="0">Never</option>
-            <option value="5">5 minutes</option>
-            <option value="15">15 minutes</option>
-            <option value="30">30 minutes</option>
-            <option value="60">1 hour</option>
-            <option value="240">4 hours</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="toolbar">
-      <button id="clearSelectionBtn">Clear selection</button>
-      <span style="flex:1"></span>
-      <button id="pdfBtn" class="primary">Prepare PDF (this + next month)</button>
-      <button id="emailBtn">Print &amp; email schedule</button>
-      <button id="summaryBtn">Employee summary</button>
-    </div>
-
-    <div class="panel" id="empPanel" style="display:none;">
-      <div class="emp-manager">
-        <div class="field"><label>Name</label><input id="newEmpName" placeholder="e.g. Randy"></div>
-        <div class="field"><label>Email</label><input id="newEmpEmail" placeholder="name@company.com"></div>
-        <div class="field"><label>Start date (optional)</label><input id="newEmpStart" type="date"></div>
-        <button id="addEmpBtn" style="padding:8px 14px;border-radius:8px;border:1px solid var(--line);cursor:pointer;">Add</button>
-      </div>
-      <div class="emp-list" id="empList"></div>
-    </div>
-
-    <div class="panel" style="margin-bottom:0;">
-      <div class="legend" id="legend"></div>
-      <div class="shift-times">
-        <span id="morningCondSlot"></span>
-        <select id="morningStartInput"></select>
-        <span id="afternoonCondSlot"></span>
-        <select id="afternoonStartInput"></select>
-      </div>
+  <div class="panel">
+    <h2>People</h2>
+    <div class="person-row" id="personRow"></div>
+    <div class="add-person">
+      <input id="newPersonName" placeholder="Full name">
+      <button id="addPersonBtn">Add person</button>
     </div>
   </div>
 
-  <div class="panel" style="overflow-x:auto;">
-    <div id="tableWrap"></div>
+  <div class="panel" id="formPanel" style="display:none;">
+    <h2 id="formPanelTitle">New reading</h2>
+    <div class="reading-form">
+      <div class="field"><label>SYS (mmHg)</label><input type="number" id="sysInput" placeholder="120"></div>
+      <div class="field"><label>DIA (mmHg)</label><input type="number" id="diaInput" placeholder="80"></div>
+      <div class="field"><label>PUL (/min)</label><input type="number" id="pulInput" placeholder="70"></div>
+      <div class="field"><label>Date &amp; time</label><input type="datetime-local" id="recordedAtInput"></div>
+      <button id="addReadingBtn">Add reading</button>
+    </div>
+    <div class="field" style="margin-top:12px;">
+      <label>Notes (optional)</label>
+      <input type="text" id="notesInput" placeholder="e.g. taken after a walk, felt dizzy…" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px;">
+    </div>
+  </div>
+
+  <div class="panel" id="recordsPanel" style="display:none;">
+    <h2 id="recordsPanelTitle">Readings</h2>
+    <div id="recordsWrap"></div>
+    <div class="toolbar-row">
+      <button id="selectAllBtn">Select all</button>
+      <button id="clearSelBtn">Clear selection</button>
+      <span style="flex:1"></span>
+      <button id="pdfBtn" class="primary">Print selected as PDF</button>
+    </div>
   </div>
 
   <div class="panel note">
-    Click a day to select it, or click a second day (even in a different employee's row) to select a block, then click a condition in the legend above to apply it. Click the same lone cell again to cancel a selection.
-    Weekends and Alberta general holidays default to a day off (yellow) automatically. Days already in the past are tinted blue automatically.
-    To swap someone's weekend for a weekday off — e.g. have them work Saturday and take Monday off instead — select the weekend day and apply "Work day," then select the weekday and apply "Weekend / Stat."
-    Applying a condition to a day that's already passed asks for your password and logs the change. Removing an employee keeps them visible on past months they worked, but hides them from the current and future schedule.
+    Click "Add reading" to log a new entry — the date and time fill in automatically but you can adjust them if needed. Check the boxes next to any readings you'd like to include, then click "Print selected as PDF" to generate a clean printable summary for that person.
   </div>
-
 </div>
 
 <div id="printArea"></div>
 
-<div class="modal-backdrop" id="pastEditModalBackdrop">
-  <div class="modal">
-    <h3>⚠ This day already happened</h3>
-    <p class="note">Changing a past date is unusual and gets logged. Enter your password to confirm.</p>
-    <div class="gate-error" id="pastEditError"></div>
-    <input type="password" id="pastEditPass" placeholder="Password" autocomplete="off" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px;margin-bottom:8px;">
-    <button id="pastEditOkBtn">Confirm change</button>
-    <button id="pastEditCancelBtn">Cancel</button>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="profileModalBackdrop">
-  <div class="modal" style="max-width:380px;">
-    <h3 style="display:flex;justify-content:space-between;align-items:center;">User profile <button id="profileCloseX" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--grey-strong);">×</button></h3>
-    <div class="field" style="margin-bottom:10px;">
-      <label style="font-size:11px;color:var(--grey-strong);">Full name</label><br>
-      <input id="profileNameInput" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px;margin-top:4px;">
-    </div>
-    <div class="field" style="margin-bottom:10px;">
-      <label style="font-size:11px;color:var(--grey-strong);">Professional title</label><br>
-      <input id="profileTitleInput" placeholder="e.g. Manager" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px;margin-top:4px;">
-    </div>
-    <div class="field" style="margin-bottom:14px;">
-      <label style="font-size:11px;color:var(--grey-strong);">Email address</label><br>
-      <input id="profileEmailInput" placeholder="name@company.com" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:14px;margin-top:4px;">
-    </div>
-    <button id="profileSaveBtn" style="background:var(--accent);color:#fff;border-color:var(--accent);">Save changes</button>
-    <button id="profileSignOutBtn" style="color:var(--red-strong);">Lock / Sign out</button>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="summaryModalBackdrop">
-  <div class="modal" style="max-width:420px;">
-    <h3>Employee summary</h3>
-    <div class="field" style="margin-bottom:12px;">
-      <label style="font-size:11px;color:var(--grey-strong);">Employee</label><br>
-      <select id="summaryEmpSelect" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:7px;font-size:13px;margin-top:4px;"></select>
-    </div>
-    <div id="summaryResults" style="font-size:13px;"></div>
-    <button id="summaryCloseBtn">Close</button>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="emailModalBackdrop">
-  <div class="modal">
-    <h3>Print &amp; email the schedule</h3>
-    <p class="note">This opens the print dialog for this month + next month (choose "Save as PDF" there), then opens an email in your default mail app addressed to everyone in your employee list (as BCC), with the subject and message pre-filled. You'll still need to attach the saved PDF yourself — browsers can't do that step automatically.</p>
-    <button id="emailGoBtn">Print PDF &amp; open email</button>
-    <button id="emailCancelBtn">Cancel</button>
-  </div>
-</div>
-
 <script>
 (function(){
-  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-
-  // condition key -> {status, shift} used for both quick-cycle and bulk range apply.
-  // "RESET" is special: clears the override entirely, reverting to the automatic default.
-  const CONDITIONS = [
-    {key:'STAT',  label:'Weekend / Stat', status:'STAT', shift:null, swatch:'weekend'},
-    {key:'WORK',   label:'Work day',            status:'WORK', shift:null, swatch:'work'},
-    {key:'M',      label:'Morning shift',       status:'WORK', shift:'M',  swatch:'work', badge:'M'},
-    {key:'A',      label:'Afternoon shift',     status:'WORK', shift:'A',  swatch:'work', badge:'A'},
-    {key:'VAC',    label:'Vacation',            status:'VAC',  shift:null, swatch:'VAC'},
-    {key:'HALF_VAC', label:'Half day vacation', status:'HALF', shift:null, half:'VAC', swatch:'half-vac'},
-    {key:'SICK',   label:'Sick day',            status:'SICK', shift:null, swatch:'SICK'},
-    {key:'HALF_SICK', label:'Half day sick', status:'HALF', shift:null, half:'SICK', swatch:'half-sick'},
-    {key:'UNPAID', label:'Unpaid day off',      status:'UNPAID', shift:null, swatch:'UNPAID'},
-    {key:'HALF_OFF',  label:'Half day off',  status:'HALF', shift:null, half:'OFF',  swatch:'half-off'},
-  ];
-  const STATUS_LABEL = {WORK:'Work day', OFF:'Day off', VAC:'Vacation', SICK:'Sick day', REQ:'Requested day off', UNPAID:'Unpaid day off', STAT:'Weekend / Stat'};
-  const SHIFT_LABEL = {M:'Morning shift', A:'Afternoon shift'};
-
-  // ---------- storage: Supabase (free hosted database) with localStorage as an offline cache ----------
-  const SUPABASE_URL = 'https://frlehxadkvgwzyxovwua.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_ioAPLi8DWuC0HCUUYEeQ3Q_dildZYKI';
+  // ---------- Supabase ----------
+  const SUPABASE_URL = 'https://httggjkxoelmulopykoi.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_fQPq4-OH5Uh40SDhMbLGgQ_ZMv82vvC';
   const SUPABASE_CONFIGURED = !SUPABASE_URL.includes('YOUR_') && !SUPABASE_ANON_KEY.includes('YOUR_');
 
-  async function storageGet(key){
-    if(SUPABASE_CONFIGURED){
-      try{
-        const res = await fetch(SUPABASE_URL + '/rest/v1/app_data?key=eq.' + encodeURIComponent(key) + '&select=value', {
-          headers: { apikey: SUPABASE_ANON_KEY }
-        });
-        if(res.ok){
-          const rows = await res.json();
-          if(rows && rows.length){
-            try{ localStorage.setItem('cache:'+key, rows[0].value); }catch(e){}
-            return rows[0].value;
-          }
-          return null;
-        }
-      }catch(e){ /* offline or misconfigured — fall back to cache below */ }
-    }
-    try{ return localStorage.getItem('cache:'+key); }catch(e){ return null; }
-  }
-
-  async function storageSet(key, value){
-    try{ localStorage.setItem('cache:'+key, value); }catch(e){}
-    if(!SUPABASE_CONFIGURED) return true;
+  async function apiGet(path){
+    if(!SUPABASE_CONFIGURED) return [];
     try{
-      await fetch(SUPABASE_URL + '/rest/v1/app_data', {
-        method: 'POST',
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          'Content-Type': 'application/json',
+      const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+        headers: { apikey: SUPABASE_ANON_KEY }
+      });
+      if(!res.ok) return [];
+      return await res.json();
+    }catch(e){ return []; }
+  }
+  async function apiInsert(table, body, returnRep){
+    if(!SUPABASE_CONFIGURED) return null;
+    try{
+      const res = await fetch(SUPABASE_URL + '/rest/v1/' + table, {
+        method:'POST',
+        headers:{
+          apikey: SUPABASE_ANON_KEY, 'Content-Type':'application/json',
+          Prefer: returnRep ? 'return=representation' : 'return=minimal'
+        },
+        body: JSON.stringify(body)
+      });
+      if(!res.ok) return null;
+      return returnRep ? await res.json() : true;
+    }catch(e){ return null; }
+  }
+  async function apiUpsert(table, body){
+    if(!SUPABASE_CONFIGURED) return;
+    try{
+      await fetch(SUPABASE_URL + '/rest/v1/' + table, {
+        method:'POST',
+        headers:{
+          apikey: SUPABASE_ANON_KEY, 'Content-Type':'application/json',
           Prefer: 'resolution=merge-duplicates,return=minimal'
         },
-        body: JSON.stringify({ key: key, value: value })
+        body: JSON.stringify(body)
       });
-    }catch(e){ /* best effort — local cache above still has it */ }
-    return true;
+    }catch(e){}
+  }
+  async function apiPatch(table, filterQS, body){
+    if(!SUPABASE_CONFIGURED) return;
+    try{
+      await fetch(SUPABASE_URL + '/rest/v1/' + table + '?' + filterQS, {
+        method:'PATCH',
+        headers:{apikey:SUPABASE_ANON_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+        body: JSON.stringify(body)
+      });
+    }catch(e){}
+  }
+  async function apiDelete(table, filterQS){
+    if(!SUPABASE_CONFIGURED) return;
+    try{
+      await fetch(SUPABASE_URL + '/rest/v1/' + table + '?' + filterQS, {
+        method:'DELETE', headers:{apikey:SUPABASE_ANON_KEY}
+      });
+    }catch(e){}
+  }
+  async function getSetting(key){
+    const rows = await apiGet('app_settings?key=eq.' + encodeURIComponent(key) + '&select=value');
+    return rows.length ? rows[0].value : null;
+  }
+  async function setSetting(key, value){
+    await apiUpsert('app_settings', {key, value});
   }
 
   async function sha256(text){
@@ -471,46 +232,7 @@
     return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
   }
 
-  function isPastDate(year, month, day){
-    return new Date(year, month, day) < today;
-  }
-
-  function requestPastEditPassword(){
-    return new Promise(resolve=>{
-      const backdrop = document.getElementById('pastEditModalBackdrop');
-      const input = document.getElementById('pastEditPass');
-      const err = document.getElementById('pastEditError');
-      const okBtn = document.getElementById('pastEditOkBtn');
-      const cancelBtn = document.getElementById('pastEditCancelBtn');
-      input.value = ''; err.textContent = '';
-      backdrop.classList.add('show');
-      setTimeout(()=>input.focus(), 50);
-
-      function cleanup(){
-        backdrop.classList.remove('show');
-        okBtn.onclick = null; cancelBtn.onclick = null; input.onkeydown = null;
-      }
-      okBtn.onclick = async ()=>{
-        const hash = await sha256(input.value);
-        const stored = await storageGet('app_password', true);
-        if(stored && hash === stored){ cleanup(); resolve(true); }
-        else { err.textContent = 'Incorrect password.'; input.value=''; }
-      };
-      cancelBtn.onclick = ()=>{ cleanup(); resolve(false); };
-      input.onkeydown = (e)=>{ if(e.key==='Enter') okBtn.click(); };
-    });
-  }
-
-  async function archiveChange(year, entry){
-    let arr = [];
-    try{
-      const raw = await storageGet('archive:'+year, true);
-      arr = raw ? JSON.parse(raw) : [];
-    }catch(e){}
-    arr.push(entry);
-    await storageSet('archive:'+year, JSON.stringify(arr), true);
-  }
-
+  // ---------- password gate ----------
   async function initGate(){
     const gate = document.getElementById('gate');
     const app = document.getElementById('app');
@@ -522,20 +244,21 @@
     const btn = document.getElementById('gateBtn');
 
     if(!SUPABASE_CONFIGURED){
-      err.textContent = 'Heads up: this copy isn\'t connected to the shared database yet (still using this browser only).';
+      err.textContent = 'Heads up: this copy isn\'t connected to the database yet.';
     }
 
-    let existingHash = await storageGet('app_password', true);
+    let existingHash = null;
+    try{ existingHash = await getSetting('app_password'); }catch(e){}
 
     const settingUp = !existingHash;
     if(settingUp){
       title.textContent = 'Set a password';
-      sub.textContent = 'Create a password to protect this schedule. Anyone who has this link and the password can view and edit it.';
+      sub.textContent = 'Create a password to protect this log. Anyone with this link and password can view and edit it.';
       p2.style.display = 'block';
       btn.textContent = 'Set password';
     } else {
       title.textContent = 'Enter password';
-      sub.textContent = 'This schedule is password-protected.';
+      sub.textContent = 'This log is password-protected.';
       p2.style.display = 'none';
       btn.textContent = 'Unlock';
     }
@@ -543,8 +266,7 @@
     function unlock(){
       gate.classList.add('hidden');
       app.style.display = 'block';
-      loadState().then(renderAll);
-      initAutoLock();
+      loadPeople();
     }
 
     btn.onclick = async ()=>{
@@ -553,7 +275,7 @@
         if(!p1.value || p1.value.length<4){ err.textContent='Use at least 4 characters.'; return; }
         if(p1.value !== p2.value){ err.textContent='Passwords do not match.'; return; }
         const hash = await sha256(p1.value);
-        await storageSet('app_password', hash, true);
+        await setSetting('app_password', hash);
         unlock();
       } else {
         const hash = await sha256(p1.value);
@@ -566,7 +288,7 @@
   }
 
   document.getElementById('changePassBtn').onclick = async ()=>{
-    let existingHash = await storageGet('app_password', true);
+    const existingHash = await getSetting('app_password');
     const cur = prompt('Enter current password:');
     if(cur===null) return;
     const curHash = await sha256(cur);
@@ -577,946 +299,213 @@
     const confirm2 = prompt('Confirm new password:');
     if(next !== confirm2){ alert('Passwords did not match.'); return; }
     const newHash = await sha256(next);
-    await storageSet('app_password', newHash, true);
+    await setSetting('app_password', newHash);
     alert('Password updated.');
   };
 
-  let today = new Date(); today.setHours(0,0,0,0);
-  let state = {
-    company: "AME Work Schedule",
-    employees: [], // {id,name,email}
-    schedules: {}, // year -> { "m-d-empId": {status, shift, moved} }
-    notes: {}      // "year-month" -> free-text string, not printed
-  };
-  let currentYear = today.getFullYear();
-  let currentMonth = today.getMonth();
-  let rangeStart = null; // {year,month,day,empId}
-  let rangeEnd = null;   // {year,month,day,empId}
-  let editingEmpId = null;
+  // ---------- state ----------
+  let people = [];
+  let currentPersonId = null;
+  let records = [];
+  let selectedIds = new Set();
 
-  // migrate old {code,moved} records (from the previous single-status model) to {status,shift,moved}
-  function migrateRecord(rec){
-    if(!rec) return rec;
-    if(rec.status !== undefined) return rec; // already new format
-    if(rec.code === 'M') return {status:'WORK', shift:'M', moved:!!rec.moved};
-    if(rec.code === 'A') return {status:'WORK', shift:'A', moved:!!rec.moved};
-    if(rec.code === 'WORK') return {status:'WORK', shift:null, moved:!!rec.moved};
-    if(rec.code) return {status:rec.code, shift:null, moved:!!rec.moved};
-    return null;
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+  function localDatetimeValue(d){
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
   }
-  function migrateYearData(obj){
-    const out = {};
-    Object.keys(obj||{}).forEach(k=>{
-      const m = migrateRecord(obj[k]);
-      if(m) out[k] = m;
-    });
-    return out;
+  function formatDisplay(iso){
+    const d = new Date(iso);
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    let h = d.getHours(); const ampm = h>=12 ? 'PM':'AM'; h = h%12; if(h===0) h=12;
+    return months[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()+' — '+h+':'+pad(d.getMinutes())+' '+ampm;
   }
 
-  // ---------- storage ----------
-  async function loadState(){
-    try{
-      const emp = await storageGet('employees', true);
-      if(emp) state.employees = JSON.parse(emp);
-    }catch(e){}
-    try{
-      const comp = await storageGet('company', true);
-      if(comp) state.company = comp;
-    }catch(e){}
-    try{
-      const sc = await storageGet('schedule:'+currentYear, true);
-      if(sc) state.schedules[currentYear] = migrateYearData(JSON.parse(sc));
-    }catch(e){}
-    if(!state.employees.length){
-      state.employees = [
-        {id:'e1',name:'Randy',email:''},
-        {id:'e2',name:'Bin',email:''},
-        {id:'e3',name:'Abuzar',email:''},
-        {id:'e4',name:'Richard',email:''},
-        {id:'e5',name:'Mario',email:''},
-      ];
+  async function loadPeople(){
+    people = await apiGet('people?select=*&order=name.asc');
+    renderPeople();
+    if(people.length && !currentPersonId){
+      currentPersonId = people[0].id;
     }
-  }
-  async function saveEmployees(){
-    await storageSet('employees', JSON.stringify(state.employees), true);
-  }
-  async function saveCompany(){
-    await storageSet('company', state.company, true);
-  }
-  async function saveYear(year){
-    await storageSet('schedule:'+year, JSON.stringify(state.schedules[year]||{}), true);
-  }
-  async function ensureYearLoaded(year){
-    if(state.schedules[year]) return;
-    try{
-      const sc = await storageGet('schedule:'+year, true);
-      state.schedules[year] = sc ? migrateYearData(JSON.parse(sc)) : {};
-    }catch(e){
-      state.schedules[year] = {};
+    if(currentPersonId){
+      await loadRecords();
     }
+    renderFormAndRecordsVisibility();
   }
-  async function ensureNotesLoaded(year, month){
-    const key = year+'-'+month;
-    if(state.notes[key] !== undefined) return;
-    try{
-      const raw = await storageGet('notes:'+key, true);
-      state.notes[key] = raw || '';
-    }catch(e){
-      state.notes[key] = '';
+
+  function renderFormAndRecordsVisibility(){
+    const has = !!currentPersonId;
+    document.getElementById('formPanel').style.display = has ? 'block':'none';
+    document.getElementById('recordsPanel').style.display = has ? 'block':'none';
+    const person = people.find(p=>p.id===currentPersonId);
+    if(person){
+      document.getElementById('formPanelTitle').textContent = 'New reading — ' + person.name;
+      document.getElementById('recordsPanelTitle').textContent = 'Readings — ' + person.name;
     }
   }
 
-  // ---------- Alberta holidays ----------
-  function easterSunday(year){
-    const a = year % 19, b = Math.floor(year/100), c = year % 100;
-    const d = Math.floor(b/4), e = b % 4;
-    const f = Math.floor((b+8)/25);
-    const g = Math.floor((b-f+1)/3);
-    const h = (19*a + b - d - g + 15) % 30;
-    const i = Math.floor(c/4), k = c % 4;
-    const l = (32 + 2*e + 2*i - h - k) % 7;
-    const m = Math.floor((a + 11*h + 22*l)/451);
-    const month = Math.floor((h + l - 7*m + 114)/31);
-    const day = ((h + l - 7*m + 114) % 31) + 1;
-    return new Date(year, month-1, day);
-  }
-  function nthWeekdayOfMonth(year, month, weekday, n){
-    let d = new Date(year, month, 1);
-    let count = 0;
-    while(true){
-      if(d.getDay()===weekday){ count++; if(count===n) return new Date(d); }
-      d.setDate(d.getDate()+1);
-    }
-  }
-  function lastWeekdayBefore(year, month, day, weekday){
-    let d = new Date(year, month, day);
-    d.setDate(d.getDate()-1);
-    while(d.getDay()!==weekday) d.setDate(d.getDate()-1);
-    return d;
-  }
-  function observedIfWeekend(d){
-    const day = d.getDay();
-    if(day===6){ const nd=new Date(d); nd.setDate(nd.getDate()+2); return nd; }
-    if(day===0){ const nd=new Date(d); nd.setDate(nd.getDate()+1); return nd; }
-    return d;
-  }
-  function albertaHolidays(year){
-    const list = [];
-    list.push({name:"New Year's Day", date: observedIfWeekend(new Date(year,0,1))});
-    list.push({name:"Family Day", date: nthWeekdayOfMonth(year,1,1,3)});
-    const easter = easterSunday(year);
-    const goodFriday = new Date(easter); goodFriday.setDate(easter.getDate()-2);
-    list.push({name:"Good Friday", date: goodFriday});
-    list.push({name:"Victoria Day", date: lastWeekdayBefore(year,4,25,1)});
-    list.push({name:"Canada Day", date: observedIfWeekend(new Date(year,6,1))});
-    list.push({name:"Labour Day", date: nthWeekdayOfMonth(year,8,1,1)});
-    list.push({name:"Thanksgiving Day", date: nthWeekdayOfMonth(year,9,1,2)});
-    list.push({name:"Remembrance Day", date: observedIfWeekend(new Date(year,10,11))});
-    list.push({name:"Christmas Day", date: observedIfWeekend(new Date(year,11,25))});
-    const map = {};
-    list.forEach(h=>{ map[fmtKey(h.date)] = h.name; });
-    return map;
-  }
-  function fmtKey(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
-
-  // ---------- schedule data helpers ----------
-  function cellKey(month, day, empId){ return month+'-'+day+'-'+empId; }
-  function getCell(year, month, day, empId){
-    ensureYearSync(year);
-    return state.schedules[year][cellKey(month,day,empId)] || null;
-  }
-  function setCell(year, month, day, empId, val){
-    ensureYearSync(year);
-    const k = cellKey(month,day,empId);
-    if(val===null) delete state.schedules[year][k];
-    else state.schedules[year][k] = val;
-    saveYear(year);
-  }
-  function ensureYearSync(year){
-    if(!state.schedules[year]) state.schedules[year] = {};
-  }
-
-  function isWeekend(d){ const dow=d.getDay(); return dow===0||dow===6; }
-  function daysInMonth(year, month){ return new Date(year, month+1, 0).getDate(); }
-  function monthOffset(year, month, offset){
-    let m = month + offset;
-    let y = year + Math.floor(m/12);
-    m = ((m%12)+12)%12;
-    return {year:y, month:m};
-  }
-  function employeesForMonth(year, month){
-    const monthEnd = new Date(year, month+1, 0);
-    return state.employees.filter(e=>{
-      if(e.hiredDate && monthEnd < new Date(e.hiredDate)) return false; // this month ended before they were hired
-      if(e.active !== false) return true; // active (or legacy record with no flag) -> always show
-      if(e.removedDate){
-        return monthEnd <= new Date(e.removedDate); // this month ended on/before removal -> they existed then
-      }
-      return false;
-    });
-  }
-
-  const SUMMARY_COLUMNS = [
-    {key:'on',     label:'On'},
-    {key:'vac',    label:'Vac'},
-    {key:'sick',   label:'Sick'},
-    {key:'unpaid', label:'Unp'},
-  ];
-
-  // Tallies status counts for one employee across a day range within a single month.
-  function computeStatsForRange(empId, year, month, dayFrom, dayTo){
-    const holidays = albertaHolidays(year);
-    const totals = {on:0, extra:0, off:0, vac:0, sick:0, req:0, unpaid:0};
-    for(let d=dayFrom; d<=dayTo; d++){
-      const dateObj = new Date(year, month, d);
-      const weekend = isWeekend(dateObj);
-      const hKey = fmtKey(dateObj);
-      const isHoliday = !!holidays[hKey];
-      const rec = getCell(year, month, d, empId);
-      const status = rec ? rec.status : ((weekend||isHoliday) ? null : 'WORK');
-      const half = rec ? (rec.half || null) : null;
-      const moved = rec ? !!rec.moved : false;
-      if(status==='WORK'){ totals.on++; if(moved) totals.extra++; }
-      else if(status==='OFF'){ totals.off++; }
-      else if(status==='VAC'){ totals.vac++; }
-      else if(status==='SICK'){ totals.sick++; }
-      else if(status==='REQ'){ totals.req++; }
-      else if(status==='UNPAID'){ totals.unpaid++; }
-      else if(status==='HALF'){
-        totals.on += 0.5;
-        if(half==='SICK') totals.sick += 0.5;
-        else if(half==='VAC') totals.vac += 0.5;
-        else totals.off += 0.5;
-      }
-    }
-    return totals;
-  }
-
-  function addTotals(a, b){
-    return {on:a.on+b.on, extra:a.extra+b.extra, off:a.off+b.off, vac:a.vac+b.vac, sick:a.sick+b.sick, req:a.req+b.req, unpaid:a.unpaid+b.unpaid};
-  }
-
-  // Full-month totals for one employee.
-  async function computeMonthStats(empId, year, month){
-    await ensureYearLoaded(year);
-    return computeStatsForRange(empId, year, month, 1, daysInMonth(year, month));
-  }
-
-  // Jan 1 through today (or through Dec 31 for a past year) for one employee.
-  async function computeYTDStats(empId, year){
-    await ensureYearLoaded(year);
-    const realToday = new Date(); realToday.setHours(0,0,0,0);
-    const isCurrentYear = year === realToday.getFullYear();
-    const lastMonth = isCurrentYear ? realToday.getMonth() : 11;
-    let totals = {on:0, extra:0, off:0, sick:0, req:0, unpaid:0};
-    for(let m=0; m<=lastMonth; m++){
-      const lastDay = (isCurrentYear && m===lastMonth) ? realToday.getDate() : daysInMonth(year, m);
-      totals = addTotals(totals, computeStatsForRange(empId, year, m, 1, lastDay));
-    }
-    return totals;
-  }
-
-  // ---------- rendering ----------
-  function empIdsInMonthOrder(year, month){
-    return employeesForMonth(year, month).map(e=>e.id);
-  }
-
-  function isInRange(year, month, day, empId){
-    if(!rangeStart) return false;
-    if(rangeStart.year!==year || rangeStart.month!==month) return false;
-    if(!rangeEnd){
-      return (day===rangeStart.day && empId===rangeStart.empId) ? 'anchor' : false;
-    }
-    if(rangeEnd.year!==year || rangeEnd.month!==month) return false;
-
-    const dayLo = Math.min(rangeStart.day, rangeEnd.day), dayHi = Math.max(rangeStart.day, rangeEnd.day);
-    if(day<dayLo || day>dayHi) return false;
-
-    const list = empIdsInMonthOrder(year, month);
-    const idxA = list.indexOf(rangeStart.empId), idxB = list.indexOf(rangeEnd.empId);
-    const idxCur = list.indexOf(empId);
-    if(idxA===-1 || idxB===-1 || idxCur===-1) return false;
-    const idxLo = Math.min(idxA, idxB), idxHi = Math.max(idxA, idxB);
-    return (idxCur>=idxLo && idxCur<=idxHi) ? 'selected' : false;
-  }
-
-  function buildMonthTable(year, month, forPrint){
-    ensureYearSync(year);
-    const holidays = albertaHolidays(year);
-    const nDays = daysInMonth(year, month);
-    const table = document.createElement('table');
-    table.className = 'sched';
-
-    const thead = document.createElement('thead');
-    const rowDow = document.createElement('tr');
-    const rowDate = document.createElement('tr');
-    const empTh = document.createElement('th'); empTh.className='emp'; empTh.textContent='Employee';
-    const empTh2 = document.createElement('th'); empTh2.className='emp'; empTh2.textContent='';
-    rowDow.appendChild(empTh); rowDate.appendChild(empTh2);
-
-    for(let d=1; d<=nDays; d++){
-      const dateObj = new Date(year, month, d);
-      const weekend = isWeekend(dateObj);
-      const hKey = fmtKey(dateObj);
-      const isHoliday = !!holidays[hKey];
-      const isPast = dateObj < today;
-
-      const th = document.createElement('th');
-      th.className = 'dow' + (weekend||isHoliday ? ' weekend':'');
-      th.textContent = DOW[dateObj.getDay()][0];
-      rowDow.appendChild(th);
-
-      const th2 = document.createElement('th');
-      th2.className = 'datenum' + (weekend?' weekend':'') + (isHoliday?' holiday':'');
-      th2.textContent = d;
-      if(isPast) th2.classList.add('past');
-      if(isHoliday){ th2.title = holidays[hKey]; const m=document.createElement('span'); m.className='holiday-mark'; m.textContent='H'; th2.appendChild(m); }
-      rowDate.appendChild(th2);
-    }
-
-    if(!forPrint){
-      const spacerTh = document.createElement('th'); spacerTh.style.cssText='border:none;min-width:6px;width:6px;background:var(--paper);';
-      rowDow.appendChild(spacerTh);
-      const spacerTh2 = document.createElement('th'); spacerTh2.style.cssText='border:none;min-width:6px;width:6px;background:var(--paper);';
-      rowDate.appendChild(spacerTh2);
-
-      SUMMARY_COLUMNS.forEach(col=>{
-        const th = document.createElement('th');
-        th.className = 'dow';
-        th.style.minWidth = '34px'; th.style.width = '34px';
-        rowDow.appendChild(th);
-        const th2 = document.createElement('th');
-        th2.className = 'datenum';
-        th2.style.minWidth = '34px'; th2.style.width = '34px';
-        th2.style.fontSize = '12px';
-        th2.style.fontWeight = '800';
-        th2.textContent = col.label;
-        rowDate.appendChild(th2);
-      });
-    }
-
-    thead.appendChild(rowDow); thead.appendChild(rowDate);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    employeesForMonth(year, month).forEach(emp=>{
-      const tr = document.createElement('tr');
-      const nameTd = document.createElement('td'); nameTd.className='emp'; nameTd.textContent = emp.name;
-      tr.appendChild(nameTd);
-      for(let d=1; d<=nDays; d++){
-        const dateObj = new Date(year, month, d);
-        const weekend = isWeekend(dateObj);
-        const hKey = fmtKey(dateObj);
-        const isHoliday = !!holidays[hKey];
-        const isPast = dateObj < today;
-        const rec = getCell(year, month, d, emp.id);
-        const td = document.createElement('td');
-        td.className = 'cell';
-        td.dataset.month = month; td.dataset.day = d; td.dataset.emp = emp.id;
-
-        const status = rec ? rec.status : null;
-        const shift = rec ? rec.shift : null;
-        const half = rec ? (rec.half || null) : null;
-        const moved = rec ? !!rec.moved : false;
-
-        if(status===null){
-          td.classList.add((weekend || isHoliday) ? 'weekend' : 'work');
-        } else if(status==='WORK'){
-          td.classList.add('work');
-        } else if(status==='STAT'){
-          td.classList.add('weekend'); // explicitly marked to look/behave like a weekend or stat day off
-        } else if(status==='OFF' && moved){
-          td.classList.add('weekend'); // a weekend day moved here — should look like a weekend day off
-        } else if(status==='HALF'){
-          td.classList.add(half==='SICK' ? 'half-sick' : (half==='VAC' ? 'half-vac' : 'half-off'));
-        } else {
-          td.classList.add(status);
-        }
-        if(moved) td.classList.add('moved');
-        if(isPast) td.classList.add('past');
-
-        if(!forPrint){
-          const rs = isInRange(year, month, d, emp.id);
-          if(rs==='anchor') td.classList.add('range-anchor');
-          if(rs==='selected') td.classList.add('range-selected');
-        }
-
-        if(shift){
-          const badge = document.createElement('span');
-          badge.className = 'shift-badge shift-' + shift;
-          badge.textContent = shift;
-          td.appendChild(badge);
-        } else if(status==='HALF'){
-          const badge = document.createElement('span');
-          badge.className = 'half-badge';
-          badge.textContent = half==='SICK' ? 'S' : (half==='VAC' ? 'V' : 'O');
-          td.appendChild(badge);
-        } else if(status && status!=='WORK' && status!=='STAT' && !(status==='OFF' && moved)){
-          const span = document.createElement('span'); span.className='code';
-          span.textContent = status[0];
-          td.appendChild(span);
-        }
-
-        let tooltip = shift ? SHIFT_LABEL[shift] : (status==='HALF' ? (half==='SICK' ? 'Half day sick' : (half==='VAC' ? 'Half day vacation' : 'Half day off')) : (status ? STATUS_LABEL[status] : ((weekend||isHoliday) ? 'Weekend/holiday (default off)' : 'Work day (default)')));
-        if(status==='OFF' && moved) tooltip = 'Weekend / Stat';
-        else if(moved) tooltip += ' (moved)';
-        if(isPast && !forPrint) tooltip += ' — past date, password required to change';
-        td.title = tooltip;
-
-        if(!forPrint){
-          td.onclick = ()=> handleCellClick(year, month, d, emp.id, weekend||isHoliday);
-        }
-        tr.appendChild(td);
-      }
-
-      if(!forPrint){
-        const spacerTd = document.createElement('td'); spacerTd.style.cssText='border:none;min-width:6px;width:6px;background:var(--paper);';
-        tr.appendChild(spacerTd);
-
-        const stats = computeStatsForRange(emp.id, year, month, 1, nDays);
-        SUMMARY_COLUMNS.forEach(col=>{
-          const td = document.createElement('td');
-          td.style.fontWeight = '700';
-          td.style.fontSize = '11px';
-          td.textContent = stats[col.key];
-          tr.appendChild(td);
-        });
-      }
-
-      tbody.appendChild(tr);
-    });
-
-    if(!forPrint){
-      const notesRow = document.createElement('tr');
-      const notesLabelTd = document.createElement('td');
-      notesLabelTd.className = 'emp';
-      notesLabelTd.textContent = 'NOTES:';
-      notesLabelTd.style.borderTop = '2px solid #000';
-      notesRow.appendChild(notesLabelTd);
-
-      const notesTd = document.createElement('td');
-      notesTd.colSpan = nDays + 1 + SUMMARY_COLUMNS.length;
-      notesTd.style.textAlign = 'left';
-      notesTd.style.borderTop = '2px solid #000';
-      const key = year+'-'+month;
-      const textarea = document.createElement('textarea');
-      textarea.value = state.notes[key] || '';
-      textarea.placeholder = 'Notes for this month (not printed)…';
-      textarea.style.cssText = 'width:100%;min-height:30px;border:none;resize:vertical;font-family:inherit;font-size:12px;padding:4px 6px;background:transparent;';
-      textarea.oninput = ()=>{ state.notes[key] = textarea.value; };
-      textarea.onblur = ()=>{ storageSet('notes:'+key, textarea.value, true); };
-      notesTd.appendChild(textarea);
-      notesRow.appendChild(notesTd);
-      tbody.appendChild(notesRow);
-    }
-
-    table.appendChild(tbody);
-    return table;
-  }
-
-  function isSameCell(a, year, month, day, empId){
-    return a && a.year===year && a.month===month && a.day===day && a.empId===empId;
-  }
-
-  function handleCellClick(year, month, day, empId, isOffDefault){
-    if(rangeStart && !rangeEnd && isSameCell(rangeStart, year, month, day, empId)){
-      // clicking the sole selected cell again clears the selection
-      rangeStart = null;
-      renderAll();
+  function renderPeople(){
+    const row = document.getElementById('personRow');
+    row.innerHTML = '';
+    if(!people.length){
+      const note = document.createElement('span');
+      note.className = 'note';
+      note.textContent = 'No one added yet — add a person below to get started.';
+      row.appendChild(note);
       return;
     }
-    if(rangeStart && rangeEnd && (isSameCell(rangeStart, year, month, day, empId) || isSameCell(rangeEnd, year, month, day, empId))){
-      // clicking either end of an already-picked block clears the whole selection
-      rangeStart = null; rangeEnd = null;
-      renderAll();
-      return;
-    }
-    if(!rangeStart){
-      rangeStart = {year, month, day, empId};
-      rangeEnd = null;
-      renderAll();
-      return;
-    }
-    if(rangeStart.year!==year || rangeStart.month!==month){
-      alert('Pick the second click within the same month as your first click. Starting over from this click.');
-      rangeStart = {year, month, day, empId};
-      rangeEnd = null;
-      renderAll();
-      return;
-    }
-    rangeEnd = {year, month, day, empId};
-    renderAll();
-  }
-
-  async function applyConditionToRange(condKey){
-    if(!rangeStart){
-      alert('Click a day first — one cell for a single change, or two cells (possibly different employees) for a block.');
-      return;
-    }
-    const cond = CONDITIONS.find(c=>c.key===condKey);
-    const {year, month} = rangeStart;
-    const endDay = rangeEnd ? rangeEnd.day : rangeStart.day;
-    const dayLo = Math.min(rangeStart.day, endDay), dayHi = Math.max(rangeStart.day, endDay);
-
-    const list = empIdsInMonthOrder(year, month);
-    const idxA = list.indexOf(rangeStart.empId);
-    const idxB = rangeEnd ? list.indexOf(rangeEnd.empId) : idxA;
-    const idxLo = Math.min(idxA, idxB), idxHi = Math.max(idxA, idxB);
-    const empIds = list.slice(idxLo, idxHi+1);
-
-    let anyPast = false;
-    for(let d=dayLo; d<=dayHi; d++){ if(isPastDate(year, month, d)){ anyPast = true; break; } }
-    if(anyPast){
-      const ok = await requestPastEditPassword();
-      if(!ok) return;
-    }
-
-    for(const empId of empIds){
-      const emp = state.employees.find(e=>e.id===empId);
-      for(let d=dayLo; d<=dayHi; d++){
-        const prev = getCell(year, month, d, empId);
-        const next = cond.key==='RESET' ? null : {status:cond.status, shift:cond.shift, half: cond.half||null, moved: !!cond.moved};
-        if(isPastDate(year, month, d)){
-          archiveChange(year, {ts:new Date().toISOString(), month, day:d, empId, empName: emp?emp.name:empId, before:prev, after:next});
-        }
-        setCell(year, month, d, empId, next);
-      }
-    }
-    rangeStart = null; rangeEnd = null;
-    renderAll();
-  }
-
-  function buildConditionButton(cond){
-    const btn = document.createElement('button');
-    const sw = document.createElement('span');
-    sw.className = 'swatch ' + cond.swatch;
-    if(cond.badge){
-      const mini = document.createElement('span');
-      mini.className = 'mini-badge shift-' + cond.badge;
-      sw.appendChild(mini);
-    }
-    btn.appendChild(sw);
-    btn.appendChild(document.createTextNode(cond.label));
-    btn.title = 'Click to apply to your selected range of days';
-    btn.onclick = ()=> applyConditionToRange(cond.key);
-    return btn;
-  }
-
-  function renderLegend(){
-    const el = document.getElementById('legend');
-    el.innerHTML = '';
-    CONDITIONS.forEach(cond=>{
-      if(cond.key==='M' || cond.key==='A') return; // these live in the shift-times row instead
-      el.appendChild(buildConditionButton(cond));
+    people.forEach(p=>{
+      const pill = document.createElement('button');
+      pill.className = 'person-pill' + (p.id===currentPersonId ? ' active':'');
+      pill.textContent = p.name;
+      pill.onclick = async ()=>{
+        currentPersonId = p.id;
+        selectedIds = new Set();
+        renderPeople();
+        renderFormAndRecordsVisibility();
+        await loadRecords();
+      };
+      row.appendChild(pill);
     });
-    const mCond = CONDITIONS.find(c=>c.key==='M');
-    const aCond = CONDITIONS.find(c=>c.key==='A');
-    const mSlot = document.getElementById('morningCondSlot');
-    const aSlot = document.getElementById('afternoonCondSlot');
-    mSlot.innerHTML = ''; aSlot.innerHTML = '';
-    if(mCond) mSlot.appendChild(buildConditionButton(mCond));
-    if(aCond) aSlot.appendChild(buildConditionButton(aCond));
   }
 
-  function renderEmployeeList(){
-    const list = document.getElementById('empList');
-    list.innerHTML = '';
-    const active = state.employees.filter(e=>e.active!==false);
-    const removed = state.employees.filter(e=>e.active===false);
-
-    active.forEach((emp, idx)=>{
-      const row = document.createElement('div'); row.className='emp-row';
-
-      const orderBtns = document.createElement('div'); orderBtns.className='order-btns';
-      const up = document.createElement('button'); up.textContent='▲'; up.title='Move up';
-      up.disabled = idx===0;
-      up.onclick = ()=> moveEmployee(emp.id, -1);
-      const down = document.createElement('button'); down.textContent='▼'; down.title='Move down';
-      down.disabled = idx===active.length-1;
-      down.onclick = ()=> moveEmployee(emp.id, 1);
-      orderBtns.appendChild(up); orderBtns.appendChild(down);
-      row.appendChild(orderBtns);
-
-      if(editingEmpId === emp.id){
-        const nameInput = document.createElement('input');
-        nameInput.value = emp.name;
-        nameInput.style.cssText = 'padding:5px 7px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;width:110px;';
-        const emailInput = document.createElement('input');
-        emailInput.value = emp.email || '';
-        emailInput.placeholder = 'name@company.com';
-        emailInput.style.cssText = 'padding:5px 7px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;flex:1;';
-        const startInput = document.createElement('input');
-        startInput.type = 'date';
-        startInput.value = emp.hiredDate || '';
-        startInput.title = 'Start date (optional)';
-        startInput.style.cssText = 'padding:5px 7px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;';
-        const saveBtn = document.createElement('button');
-        saveBtn.textContent = 'Save'; saveBtn.style.color = 'var(--green-strong)';
-        saveBtn.onclick = ()=>{
-          const newName = nameInput.value.trim();
-          if(!newName){ alert('Name can\'t be empty.'); return; }
-          emp.name = newName;
-          emp.email = emailInput.value.trim();
-          emp.hiredDate = startInput.value || null;
-          editingEmpId = null;
-          saveEmployees();
-          renderAll();
-        };
-        const cancelBtn = document.createElement('button');
-        cancelBtn.textContent = 'Cancel';
-        cancelBtn.onclick = ()=>{ editingEmpId = null; renderAll(); };
-
-        row.appendChild(nameInput); row.appendChild(emailInput); row.appendChild(startInput); row.appendChild(saveBtn); row.appendChild(cancelBtn);
-      } else {
-        const name = document.createElement('span'); name.className='name'; name.textContent = emp.name;
-        const email = document.createElement('span'); email.className='email';
-        email.textContent = (emp.email || '(no email)') + (emp.hiredDate ? (' — starts ' + emp.hiredDate) : '');
-        const edit = document.createElement('button'); edit.textContent='Edit'; edit.style.color = 'var(--blue-past-strong)';
-        edit.onclick = ()=>{ editingEmpId = emp.id; renderAll(); };
-        const del = document.createElement('button'); del.textContent='Remove';
-        del.onclick = ()=>{
-          if(!confirm('Remove ' + emp.name + '? They\'ll stay visible on past months\' schedules but will no longer appear on the current or future schedule.')) return;
-          emp.active = false;
-          emp.removedDate = new Date().toISOString().slice(0,10);
-          saveEmployees();
-          renderAll();
-        };
-        row.appendChild(name); row.appendChild(email); row.appendChild(edit); row.appendChild(del);
-      }
-
-      list.appendChild(row);
-    });
-
-    if(removed.length){
-      const divider = document.createElement('div');
-      divider.className = 'note';
-      divider.style.marginTop = '8px';
-      divider.textContent = 'Removed employees (still shown on past months they worked):';
-      list.appendChild(divider);
-
-      removed.forEach(emp=>{
-        const row = document.createElement('div'); row.className='emp-row';
-        row.style.opacity = '.65';
-        const name = document.createElement('span'); name.className='name'; name.textContent = emp.name;
-        const email = document.createElement('span'); email.className='email';
-        email.textContent = (emp.email || '(no email)') + ' — removed ' + emp.removedDate;
-        const restore = document.createElement('button'); restore.textContent='Restore'; restore.style.color='var(--green-strong)';
-        restore.onclick = ()=>{ emp.active = true; emp.removedDate = null; saveEmployees(); renderAll(); };
-        row.appendChild(name); row.appendChild(email); row.appendChild(restore);
-        list.appendChild(row);
-      });
-    }
-  }
-
-  function moveEmployee(empId, dir){
-    const activeIds = state.employees.filter(e=>e.active!==false).map(e=>e.id);
-    const pos = activeIds.indexOf(empId);
-    const newPos = pos + dir;
-    if(newPos<0 || newPos>=activeIds.length) return;
-    const idxA = state.employees.findIndex(e=>e.id===empId);
-    const idxB = state.employees.findIndex(e=>e.id===activeIds[newPos]);
-    [state.employees[idxA], state.employees[idxB]] = [state.employees[idxB], state.employees[idxA]];
-    saveEmployees();
-    renderAll();
-  }
-
-  let didInitialScroll = false;
-
-  async function renderAll(){
-    const monthsToShow = [];
-    for(let m=0; m<12; m++) monthsToShow.push({year:currentYear, month:m});
-    monthsToShow.push({year:currentYear+1, month:0});
-    monthsToShow.push({year:currentYear+1, month:1});
-
-    const years = Array.from(new Set(monthsToShow.map(m=>m.year)));
-    await Promise.all(years.map(y=>ensureYearLoaded(y)));
-    await Promise.all(monthsToShow.map(m=>ensureNotesLoaded(m.year, m.month)));
-
-    document.getElementById('yearInput').value = currentYear;
-    document.getElementById('companyName').value = state.company;
-
-    const wrap = document.getElementById('tableWrap');
-    wrap.innerHTML = '';
-    monthsToShow.forEach(m=>{
-      const block = document.createElement('div');
-      block.className = 'month-block';
-      block.id = 'month-' + m.year + '-' + m.month;
-      const h3 = document.createElement('h3');
-      h3.textContent = MONTHS[m.month] + ' ' + m.year;
-      block.appendChild(h3);
-      block.appendChild(buildMonthTable(m.year, m.month, false));
-      wrap.appendChild(block);
-    });
-
-    renderLegend();
-    renderEmployeeList();
-
-    if(!didInitialScroll){
-      didInitialScroll = true;
-      const realToday = new Date();
-      const targetId = 'month-' + realToday.getFullYear() + '-' + realToday.getMonth();
-      setTimeout(()=>{
-        const el = document.getElementById(targetId);
-        const sticky = document.getElementById('stickyTop');
-        if(el){
-          const stickyHeight = sticky ? sticky.offsetHeight : 0;
-          const top = el.getBoundingClientRect().top + window.scrollY - stickyHeight - 12;
-          window.scrollTo({ top: Math.max(top, 0), behavior: 'auto' });
-        }
-      }, 30);
-    }
-  }
-
-  // ---------- controls ----------
-  document.getElementById('yearPrev').onclick = ()=>{ currentYear--; renderAll(); };
-  document.getElementById('yearNext').onclick = ()=>{ currentYear++; renderAll(); };
-  document.getElementById('yearInput').onchange = (e)=>{ const v=parseInt(e.target.value,10); if(v>1900&&v<3000){ currentYear=v; renderAll(); } };
-
-  document.getElementById('companyName').oninput = (e)=>{ state.company = e.target.value; };
-  document.getElementById('companyName').onblur = saveCompany;
-
-  document.getElementById('addEmpToggle').onclick = ()=>{
-    const p = document.getElementById('empPanel');
-    p.style.display = p.style.display==='none' ? 'block':'none';
-  };
-  document.getElementById('addEmpBtn').onclick = ()=>{
-    const name = document.getElementById('newEmpName').value.trim();
-    const email = document.getElementById('newEmpEmail').value.trim();
-    const startDate = document.getElementById('newEmpStart').value; // yyyy-mm-dd or ''
+  document.getElementById('addPersonBtn').onclick = async ()=>{
+    const nameInput = document.getElementById('newPersonName');
+    const name = nameInput.value.trim();
     if(!name) return;
-    state.employees.push({id:'e'+Date.now(), name, email, active:true, hiredDate: startDate || null});
-    document.getElementById('newEmpName').value='';
-    document.getElementById('newEmpEmail').value='';
-    document.getElementById('newEmpStart').value='';
-    saveEmployees();
-    renderAll();
+    const rows = await apiInsert('people', {name}, true);
+    nameInput.value = '';
+    if(rows && rows.length){
+      currentPersonId = rows[0].id;
+    }
+    await loadPeople();
   };
 
-  function buildPrintArea(){
+  async function loadRecords(){
+    if(!currentPersonId){ records = []; renderRecords(); return; }
+    records = await apiGet('bp_records?person_id=eq.' + currentPersonId + '&select=*&order=recorded_at.desc');
+    renderRecords();
+  }
+
+  function renderRecords(){
+    const wrap = document.getElementById('recordsWrap');
+    wrap.innerHTML = '';
+    if(!records.length){
+      const note = document.createElement('div');
+      note.className = 'empty-note';
+      note.textContent = 'No readings logged yet for this person.';
+      wrap.appendChild(note);
+      return;
+    }
+    const table = document.createElement('table');
+    table.className = 'records';
+    const thead = document.createElement('thead');
+    thead.innerHTML = '<tr><th></th><th>Date &amp; time</th><th>SYS</th><th>DIA</th><th>PUL</th><th></th></tr>';
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+    records.forEach(r=>{
+      const tr = document.createElement('tr');
+      const selTd = document.createElement('td'); selTd.className = 'sel';
+      const cb = document.createElement('input'); cb.type = 'checkbox';
+      cb.checked = selectedIds.has(r.id);
+      cb.onchange = ()=>{ if(cb.checked) selectedIds.add(r.id); else selectedIds.delete(r.id); };
+      selTd.appendChild(cb);
+      const dtTd = document.createElement('td'); dtTd.className='dt'; dtTd.textContent = formatDisplay(r.recorded_at);
+      const sysTd = document.createElement('td'); sysTd.textContent = r.sys;
+      const diaTd = document.createElement('td'); diaTd.textContent = r.dia;
+      const pulTd = document.createElement('td'); pulTd.textContent = r.pul;
+      const delTd = document.createElement('td'); delTd.className='del'; delTd.textContent='Delete';
+      delTd.onclick = async ()=>{
+        if(!confirm('Delete this reading?')) return;
+        await apiDelete('bp_records', 'id=eq.' + r.id);
+        selectedIds.delete(r.id);
+        await loadRecords();
+      };
+      tr.appendChild(selTd); tr.appendChild(dtTd); tr.appendChild(sysTd); tr.appendChild(diaTd); tr.appendChild(pulTd); tr.appendChild(delTd);
+      tbody.appendChild(tr);
+      if(r.notes){
+        const noteTr = document.createElement('tr');
+        const noteTd = document.createElement('td');
+        noteTd.colSpan = 6;
+        noteTd.style.cssText = 'text-align:left;font-style:italic;color:var(--grey-strong);font-size:12.5px;background:#fafcfd;border-top:none;';
+        noteTd.textContent = '📝 ' + r.notes;
+        noteTr.appendChild(noteTd);
+        tbody.appendChild(noteTr);
+      }
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+  }
+
+  // default the datetime field to "now" whenever the form becomes relevant
+  function setNowOnDatetimeField(){
+    document.getElementById('recordedAtInput').value = localDatetimeValue(new Date());
+  }
+  setNowOnDatetimeField();
+
+  document.getElementById('addReadingBtn').onclick = async ()=>{
+    if(!currentPersonId){ alert('Add a person first.'); return; }
+    const sys = parseInt(document.getElementById('sysInput').value, 10);
+    const dia = parseInt(document.getElementById('diaInput').value, 10);
+    const pul = parseInt(document.getElementById('pulInput').value, 10);
+    const dtVal = document.getElementById('recordedAtInput').value;
+    const notes = document.getElementById('notesInput').value.trim();
+    if(!sys || !dia || !pul){ alert('Please fill in SYS, DIA, and PUL.'); return; }
+    if(!dtVal){ alert('Please set a date and time.'); return; }
+    const recordedAt = new Date(dtVal).toISOString();
+    await apiInsert('bp_records', {person_id: currentPersonId, sys, dia, pul, recorded_at: recordedAt, notes: notes || null}, false);
+    document.getElementById('sysInput').value = '';
+    document.getElementById('diaInput').value = '';
+    document.getElementById('pulInput').value = '';
+    document.getElementById('notesInput').value = '';
+    setNowOnDatetimeField();
+    await loadRecords();
+  };
+
+  document.getElementById('selectAllBtn').onclick = ()=>{
+    records.forEach(r=>selectedIds.add(r.id));
+    renderRecords();
+  };
+  document.getElementById('clearSelBtn').onclick = ()=>{
+    selectedIds = new Set();
+    renderRecords();
+  };
+
+  document.getElementById('pdfBtn').onclick = ()=>{
+    const person = people.find(p=>p.id===currentPersonId);
+    const selected = records.filter(r=>selectedIds.has(r.id));
+    if(!selected.length){ alert('Check at least one reading to include in the PDF.'); return; }
+    // print in chronological order (oldest first) for a clean readable report
+    selected.sort((a,b)=> new Date(a.recorded_at) - new Date(b.recorded_at));
     const printArea = document.getElementById('printArea');
     printArea.innerHTML = '';
-    const nextMonth = (currentMonth+1) % 12;
-    const nextYear = currentMonth===11 ? currentYear+1 : currentYear;
-    ensureYearSync(nextYear);
-
-    const h1 = document.createElement('h1'); h1.textContent = state.company;
-    printArea.appendChild(h1);
-
-    [[currentYear,currentMonth],[nextYear,nextMonth]].forEach(([y,m])=>{
-      const h2 = document.createElement('h2'); h2.textContent = MONTHS[m] + ' ' + y;
-      printArea.appendChild(h2);
-      printArea.appendChild(buildMonthTable(y, m, true));
-    });
-  }
-
-  document.getElementById('pdfBtn').onclick = async ()=>{
-    const nextYear = currentMonth===11 ? currentYear+1 : currentYear;
-    await ensureYearLoaded(nextYear);
-    buildPrintArea();
-    window.print();
-  };
-
-  const summaryBackdrop = document.getElementById('summaryModalBackdrop');
-  const summarySelect = document.getElementById('summaryEmpSelect');
-  document.getElementById('clearSelectionBtn').onclick = ()=>{
-    rangeStart = null; rangeEnd = null;
-    renderAll();
-  };
-
-  document.getElementById('summaryBtn').onclick = async ()=>{
-    summarySelect.innerHTML = '';
-    state.employees.forEach(emp=>{
-      const opt = document.createElement('option');
-      opt.value = emp.id;
-      opt.textContent = emp.name + (emp.active===false ? ' (removed)' : '');
-      summarySelect.appendChild(opt);
-    });
-    summaryBackdrop.classList.add('show');
-    await renderSummaryResults();
-  };
-  document.getElementById('summaryCloseBtn').onclick = ()=>{ summaryBackdrop.classList.remove('show'); };
-  summarySelect.onchange = renderSummaryResults;
-
-  async function renderSummaryResults(){
-    const empId = summarySelect.value;
-    const emp = state.employees.find(e=>e.id===empId);
-    const results = document.getElementById('summaryResults');
-    if(!emp){ results.innerHTML = ''; return; }
-    results.innerHTML = '<p class="note">Loading…</p>';
-
-    const monthStats = await computeMonthStats(empId, currentYear, currentMonth);
-    const ytdStats = await computeYTDStats(empId, currentYear);
-
-    function table(title, stats){
-      let rows = SUMMARY_COLUMNS.map(col=>
-        '<tr><td style="padding:3px 8px 3px 0;">' + col.label + (col.key==='extra' ? ' (worked a moved weekend day)' : '') + '</td>' +
-        '<td style="padding:3px 0;font-weight:700;text-align:right;">' + stats[col.key] + '</td></tr>'
-      ).join('');
-      return '<h4 style="margin:14px 0 4px;">' + title + '</h4><table style="width:100%;border-collapse:collapse;">' + rows + '</table>';
-    }
-
-    results.innerHTML =
-      table(MONTHS[currentMonth] + ' ' + currentYear, monthStats) +
-      table('Year to date (' + currentYear + ')', ytdStats);
-  }
-
-  const emailBackdrop = document.getElementById('emailModalBackdrop');
-  document.getElementById('emailBtn').onclick = ()=>{ emailBackdrop.classList.add('show'); };
-  document.getElementById('emailCancelBtn').onclick = ()=>{ emailBackdrop.classList.remove('show'); };
-  document.getElementById('emailGoBtn').onclick = async ()=>{
-    emailBackdrop.classList.remove('show');
-    const nextYear = currentMonth===11 ? currentYear+1 : currentYear;
-    await ensureYearLoaded(nextYear);
-    buildPrintArea();
-    window.print();
-    const emails = state.employees.map(e=>e.email).filter(Boolean).join(';');
-    const nextMonth = (currentMonth+1)%12;
-    const subject = encodeURIComponent(state.company + ' - ' + MONTHS[currentMonth] + ' & ' + MONTHS[nextMonth] + ' schedule');
-    const body = encodeURIComponent('Hi all,\n\nAttached is the work schedule for ' + MONTHS[currentMonth] + ' and ' + MONTHS[nextMonth] + '.\n\nThanks.');
-    setTimeout(()=>{
-      window.location.href = 'mailto:?bcc=' + encodeURIComponent(emails) + '&subject=' + subject + '&body=' + body;
-    }, 400);
-  };
-
-  // ---------- banner: gear dropdown + manager profile ----------
-  const gearBtn = document.getElementById('gearBtn');
-  const gearDropdown = document.getElementById('gearDropdown');
-  gearBtn.onclick = (e)=>{
-    e.stopPropagation();
-    gearDropdown.classList.toggle('show');
-  };
-  document.addEventListener('click', (e)=>{
-    if(gearDropdown.classList.contains('show') && !gearDropdown.contains(e.target) && e.target !== gearBtn){
-      gearDropdown.classList.remove('show');
-    }
-  });
-  // close the dropdown once either of its actions is used
-  document.getElementById('addEmpToggle').addEventListener('click', ()=> gearDropdown.classList.remove('show'));
-  document.getElementById('changePassBtn').addEventListener('click', ()=> gearDropdown.classList.remove('show'));
-
-  // ---------- auto-lock after inactivity ----------
-  let sessionTimeoutMinutes = 30;
-  let inactivityTimer = null;
-
-  function lockApp(){
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('gate').classList.remove('hidden');
-    document.getElementById('gatePass').value = '';
-    initGate();
-  }
-
-  function resetInactivityTimer(){
-    if(inactivityTimer) clearTimeout(inactivityTimer);
-    if(sessionTimeoutMinutes > 0){
-      inactivityTimer = setTimeout(lockApp, sessionTimeoutMinutes * 60 * 1000);
-    }
-  }
-
-  ['mousemove','keydown','mousedown','scroll','touchstart'].forEach(evt=>{
-    document.addEventListener(evt, ()=>{ if(document.getElementById('app').style.display !== 'none') resetInactivityTimer(); }, {passive:true});
-  });
-
-  document.getElementById('sessionTimeoutSelect').onchange = async (e)=>{
-    sessionTimeoutMinutes = parseInt(e.target.value, 10);
-    await storageSet('sessionTimeoutMinutes', String(sessionTimeoutMinutes), true);
-    resetInactivityTimer();
-  };
-
-  async function initAutoLock(){
-    try{
-      const raw = await storageGet('sessionTimeoutMinutes', true);
-      sessionTimeoutMinutes = raw !== null ? parseInt(raw, 10) : 30;
-    }catch(e){
-      sessionTimeoutMinutes = 30;
-    }
-    document.getElementById('sessionTimeoutSelect').value = String(sessionTimeoutMinutes);
-    resetInactivityTimer();
-  }
-
-  // ---------- shift start times (shared reference times for Morning/Afternoon) ----------
-  function formatHalfHour(h, m){
-    const period = h < 12 ? 'AM' : 'PM';
-    let h12 = h % 12; if(h12===0) h12 = 12;
-    return h12 + ':' + (m===0 ? '00' : '30') + ' ' + period;
-  }
-  function buildTimeOptions(selectEl, storedValue){
-    selectEl.innerHTML = '';
-    for(let h=0; h<24; h++){
-      for(let m=0; m<60; m+=30){
-        const value = h + ':' + (m===0 ? '00' : '30');
-        const opt = document.createElement('option');
-        opt.value = value;
-        opt.textContent = formatHalfHour(h, m);
-        if(value === storedValue) opt.selected = true;
-        selectEl.appendChild(opt);
+    const h1 = document.createElement('h1'); h1.textContent = 'Blood Pressure Log';
+    const sub = document.createElement('div'); sub.className='sub';
+    sub.textContent = (person ? person.name : '') + ' — ' + selected.length + ' reading' + (selected.length===1?'':'s') + ' — printed ' + formatDisplay(new Date().toISOString());
+    printArea.appendChild(h1); printArea.appendChild(sub);
+    const table = document.createElement('table');
+    table.innerHTML = '<thead><tr><th>Date &amp; time</th><th>SYS (mmHg)</th><th>DIA (mmHg)</th><th>PUL (/min)</th></tr></thead>';
+    const tbody = document.createElement('tbody');
+    selected.forEach(r=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td style="text-align:left;">'+formatDisplay(r.recorded_at)+'</td><td>'+r.sys+'</td><td>'+r.dia+'</td><td>'+r.pul+'</td>';
+      tbody.appendChild(tr);
+      if(r.notes){
+        const noteTr = document.createElement('tr');
+        const noteTd = document.createElement('td');
+        noteTd.colSpan = 4;
+        noteTd.style.cssText = 'text-align:left;font-style:italic;font-size:12px;color:#444;border-top:none;';
+        noteTd.textContent = 'Note: ' + r.notes;
+        noteTr.appendChild(noteTd);
+        tbody.appendChild(noteTr);
       }
-    }
-  }
-  async function initShiftTimes(){
-    const morningSel = document.getElementById('morningStartInput');
-    const afternoonSel = document.getElementById('afternoonStartInput');
-    let stored = {morning:'7:00', afternoon:'13:00'};
-    try{
-      const raw = await storageGet('shiftTimes', true);
-      if(raw) stored = JSON.parse(raw);
-    }catch(e){}
-    buildTimeOptions(morningSel, stored.morning);
-    buildTimeOptions(afternoonSel, stored.afternoon);
-    morningSel.onchange = saveShiftTimes;
-    afternoonSel.onchange = saveShiftTimes;
-  }
-  async function saveShiftTimes(){
-    const value = {
-      morning: document.getElementById('morningStartInput').value,
-      afternoon: document.getElementById('afternoonStartInput').value
-    };
-    await storageSet('shiftTimes', JSON.stringify(value), true);
-  }
-
-  async function loadManagerProfile(){
-    try{
-      const raw = await storageGet('managerProfile', true);
-      return raw ? JSON.parse(raw) : {name:'', title:'Manager', email:''};
-    }catch(e){
-      return {name:'', title:'Manager', email:''};
-    }
-  }
-  function applyProfileToBanner(profile){
-    document.getElementById('bannerRole').textContent = (profile.title || 'Manager').toUpperCase();
-    document.getElementById('bannerName').textContent = profile.name ? profile.name : 'Set your name';
-  }
-
-  const profileBackdrop = document.getElementById('profileModalBackdrop');
-  document.getElementById('profileBtn').onclick = async ()=>{
-    const profile = await loadManagerProfile();
-    document.getElementById('profileNameInput').value = profile.name || '';
-    document.getElementById('profileTitleInput').value = profile.title || '';
-    document.getElementById('profileEmailInput').value = profile.email || '';
-    profileBackdrop.classList.add('show');
-  };
-  document.getElementById('profileCloseX').onclick = ()=> profileBackdrop.classList.remove('show');
-  document.getElementById('profileSaveBtn').onclick = async ()=>{
-    const profile = {
-      name: document.getElementById('profileNameInput').value.trim(),
-      title: document.getElementById('profileTitleInput').value.trim() || 'Manager',
-      email: document.getElementById('profileEmailInput').value.trim()
-    };
-    await storageSet('managerProfile', JSON.stringify(profile), true);
-    applyProfileToBanner(profile);
-    profileBackdrop.classList.remove('show');
-  };
-  document.getElementById('profileSignOutBtn').onclick = ()=>{
-    profileBackdrop.classList.remove('show');
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('gate').classList.remove('hidden');
-    document.getElementById('gatePass').value = '';
-    initGate();
+    });
+    table.appendChild(tbody);
+    printArea.appendChild(table);
+    window.print();
   };
 
   // init
   initGate();
-  loadManagerProfile().then(applyProfileToBanner);
-  initShiftTimes();
 })();
 </script>
 </body>
