@@ -308,6 +308,7 @@
   let currentPersonId = null;
   let records = [];
   let selectedIds = new Set();
+  let editingRecordId = null;
 
   function pad(n){ return n<10 ? '0'+n : ''+n; }
   function localDatetimeValue(d){
@@ -399,10 +400,76 @@
     const table = document.createElement('table');
     table.className = 'records';
     const thead = document.createElement('thead');
-    thead.innerHTML = '<tr><th></th><th>Date &amp; time</th><th>SYS</th><th>DIA</th><th>PUL</th><th></th></tr>';
+    const headSelTd = document.createElement('th'); headSelTd.className='sel';
+    const headSelCb = document.createElement('input'); headSelCb.type='checkbox';
+    headSelCb.title = 'Select all';
+    headSelCb.checked = records.length>0 && records.every(r=>selectedIds.has(r.id));
+    headSelCb.onchange = ()=>{
+      if(headSelCb.checked) records.forEach(r=>selectedIds.add(r.id));
+      else records.forEach(r=>selectedIds.delete(r.id));
+      renderRecords();
+    };
+    headSelTd.appendChild(headSelCb);
+    const restHead = document.createElement('tr');
+    restHead.innerHTML = '<th>Date &amp; time</th><th>SYS</th><th>DIA</th><th>PUL</th><th></th><th></th>';
+    const headRow = document.createElement('tr');
+    headRow.appendChild(headSelTd);
+    Array.from(restHead.children).forEach(th=>headRow.appendChild(th));
+    thead.appendChild(headRow);
     table.appendChild(thead);
     const tbody = document.createElement('tbody');
+
     records.forEach(r=>{
+      if(editingRecordId === r.id){
+        const tr = document.createElement('tr');
+        const blankTd = document.createElement('td');
+        const dtTd = document.createElement('td');
+        const dtInput = document.createElement('input'); dtInput.type='datetime-local';
+        dtInput.value = localDatetimeValue(new Date(r.recorded_at));
+        dtInput.style.cssText = 'padding:5px;border:1px solid var(--line);border-radius:6px;width:180px;';
+        dtTd.appendChild(dtInput);
+        const sysTd = document.createElement('td');
+        const sysInput = document.createElement('input'); sysInput.type='number'; sysInput.value=r.sys;
+        sysInput.style.cssText = 'width:60px;padding:5px;border:1px solid var(--line);border-radius:6px;text-align:center;';
+        sysTd.appendChild(sysInput);
+        const diaTd = document.createElement('td');
+        const diaInput = document.createElement('input'); diaInput.type='number'; diaInput.value=r.dia;
+        diaInput.style.cssText = sysInput.style.cssText;
+        diaTd.appendChild(diaInput);
+        const pulTd = document.createElement('td');
+        const pulInput = document.createElement('input'); pulInput.type='number'; pulInput.value=r.pul;
+        pulInput.style.cssText = sysInput.style.cssText;
+        pulTd.appendChild(pulInput);
+        const saveTd = document.createElement('td'); saveTd.style.cssText='color:var(--accent-strong);cursor:pointer;font-size:12px;'; saveTd.textContent='Save';
+        const cancelTd = document.createElement('td'); cancelTd.style.cssText='color:var(--grey-strong);cursor:pointer;font-size:12px;'; cancelTd.textContent='Cancel';
+        tr.appendChild(blankTd); tr.appendChild(dtTd); tr.appendChild(sysTd); tr.appendChild(diaTd); tr.appendChild(pulTd); tr.appendChild(saveTd); tr.appendChild(cancelTd);
+        tbody.appendChild(tr);
+
+        const noteTr = document.createElement('tr');
+        const noteTd = document.createElement('td'); noteTd.colSpan = 7;
+        noteTd.style.cssText = 'text-align:left;background:#fafcfd;border-top:none;';
+        const noteInput = document.createElement('input'); noteInput.type='text'; noteInput.value = r.notes || '';
+        noteInput.placeholder = 'Notes (optional)';
+        noteInput.style.cssText = 'width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;';
+        noteTd.appendChild(noteInput);
+        noteTr.appendChild(noteTd);
+        tbody.appendChild(noteTr);
+
+        saveTd.onclick = async ()=>{
+          const sys = parseInt(sysInput.value,10), dia = parseInt(diaInput.value,10), pul = parseInt(pulInput.value,10);
+          if(!sys || !dia || !pul || !dtInput.value){ alert('Please fill in SYS, DIA, PUL, and the date/time.'); return; }
+          await apiPatch('bp_records', 'id=eq.'+r.id, {
+            sys, dia, pul,
+            recorded_at: new Date(dtInput.value).toISOString(),
+            notes: noteInput.value.trim() || null
+          });
+          editingRecordId = null;
+          await loadRecords();
+        };
+        cancelTd.onclick = ()=>{ editingRecordId = null; renderRecords(); };
+        return;
+      }
+
       const tr = document.createElement('tr');
       const selTd = document.createElement('td'); selTd.className = 'sel';
       const cb = document.createElement('input'); cb.type = 'checkbox';
@@ -413,6 +480,8 @@
       const sysTd = document.createElement('td'); sysTd.textContent = r.sys;
       const diaTd = document.createElement('td'); diaTd.textContent = r.dia;
       const pulTd = document.createElement('td'); pulTd.textContent = r.pul;
+      const editTd = document.createElement('td'); editTd.style.cssText='color:var(--accent-strong);cursor:pointer;font-size:12px;'; editTd.textContent='Edit';
+      editTd.onclick = ()=>{ editingRecordId = r.id; renderRecords(); };
       const delTd = document.createElement('td'); delTd.className='del'; delTd.textContent='Delete';
       delTd.onclick = async ()=>{
         if(!confirm('Delete this reading?')) return;
@@ -420,12 +489,12 @@
         selectedIds.delete(r.id);
         await loadRecords();
       };
-      tr.appendChild(selTd); tr.appendChild(dtTd); tr.appendChild(sysTd); tr.appendChild(diaTd); tr.appendChild(pulTd); tr.appendChild(delTd);
+      tr.appendChild(selTd); tr.appendChild(dtTd); tr.appendChild(sysTd); tr.appendChild(diaTd); tr.appendChild(pulTd); tr.appendChild(editTd); tr.appendChild(delTd);
       tbody.appendChild(tr);
       if(r.notes){
         const noteTr = document.createElement('tr');
         const noteTd = document.createElement('td');
-        noteTd.colSpan = 6;
+        noteTd.colSpan = 7;
         noteTd.style.cssText = 'text-align:left;font-style:italic;color:var(--grey-strong);font-size:12.5px;background:#fafcfd;border-top:none;';
         noteTd.textContent = '📝 ' + r.notes;
         noteTr.appendChild(noteTd);
@@ -479,9 +548,12 @@
     const printArea = document.getElementById('printArea');
     printArea.innerHTML = '';
     const h1 = document.createElement('h1'); h1.textContent = 'Blood Pressure Log';
+    const nameLine = document.createElement('div');
+    nameLine.style.cssText = 'font-size:19px;font-weight:700;color:#111;margin:2px 0 6px;';
+    nameLine.textContent = person ? person.name : '';
     const sub = document.createElement('div'); sub.className='sub';
-    sub.textContent = (person ? person.name : '') + ' — ' + selected.length + ' reading' + (selected.length===1?'':'s') + ' — printed ' + formatDisplay(new Date().toISOString());
-    printArea.appendChild(h1); printArea.appendChild(sub);
+    sub.textContent = selected.length + ' reading' + (selected.length===1?'':'s') + ' — printed ' + formatDisplay(new Date().toISOString());
+    printArea.appendChild(h1); printArea.appendChild(nameLine); printArea.appendChild(sub);
     const table = document.createElement('table');
     table.innerHTML = '<thead><tr><th>Date &amp; time</th><th>SYS (mmHg)</th><th>DIA (mmHg)</th><th>PUL (/min)</th></tr></thead>';
     const tbody = document.createElement('tbody');
